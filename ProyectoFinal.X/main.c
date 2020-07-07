@@ -60,6 +60,7 @@
 #include "framework/USB/USB_fwk.h"
 #include "string.h"
 #include "mcc_generated_files/adc1.h"
+#include "Temperature/TEMP_MANAGER.h"
 
 void blinkLED(void *p_param);
 
@@ -86,32 +87,38 @@ int main(void) {
 
 void blinkLED(void *p_param) {
     // Add your code here
-    int output ,i;
+    uint8_t i, counterPressed, finishedTemperature;
+    bool BTN1_pressed = false;
     ADC1_ChannelSelect(TEMP);
     for (;;) {
         USB_checkStatus();
-        if (USB_getConnectedStatus()) {
-            if (BTN1_GetValue()) {
-                ADC1_SoftwareTriggerEnable();
-                //Provide Delay
-                vTaskDelay(pdMS_TO_TICKS(2000));
-
-                ADC1_SoftwareTriggerDisable();
-                while (!ADC1_IsConversionComplete(TEMP));
-                output = ADC1_ConversionResultGet(TEMP);
+        if (BTN1_GetValue()) {
+            BTN1_pressed = !BTN1_pressed;
+            counterPressed=0;
+            finishedTemperature=0;
+        } else if (BTN1_pressed && counterPressed<10) {
+            if(counterPressed%2==0){
                 for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLUE);
-                LEDA_SetHigh();
-                USB_send(&output);
-            } else {
-                for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLACK);
-
-                LEDA_SetLow();
             }
+            else{
+                for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLACK);
+            }
+            finishedTemperature+= getTemperature();
+            vTaskDelay(pdMS_TO_TICKS(240));
             RGB_showLeds(8);
+            counterPressed++;
         }
-
+        else if (BTN1_pressed && counterPressed==10){
+            finishedTemperature /=10;
+            if(finishedTemperature>37){
+                for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_RED);
+            }
+            else{
+                for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_GREEN);
+            }
+            vTaskDelay(pdMS_TO_TICKS(2000));
+        }
     }
-
 }
 
 void vApplicationMallocFailedHook(void) {

@@ -84,16 +84,16 @@
 #include "clock.h"
 #include "system.h"
 #include "rtcc.h"
+#include "adc1.h"
+#include "usb/usb.h"
 #include "interrupt_manager.h"
 #include "exceptions.h"
-#include "usb/usb.h"
-#include "adc1.h"
 
 void SYSTEM_Initialize(void)
 {
     PIN_MANAGER_Initialize();
-    INTERRUPT_Initialize();
     CLOCK_Initialize();
+    INTERRUPT_Initialize();
     USBDeviceInit();
     USBDeviceAttach();
     ADC1_Initialize();

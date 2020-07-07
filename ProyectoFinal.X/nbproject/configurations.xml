@@ -46,6 +46,7 @@
       <itemPath>platform/WS2812.h</itemPath>
       <itemPath>framework/USB/USB_fwk.h</itemPath>
       <itemPath>framework/LEDs_RGB/LEDs_RGB_fwk.h</itemPath>
+      <itemPath>Temperature/TEMP_MANAGER.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -89,6 +90,7 @@
       <itemPath>platform/WS2812.c</itemPath>
       <itemPath>framework/USB/USB_fwk.c</itemPath>
       <itemPath>framework/LEDs_RGB/LEDs_RGB_fwk.c</itemPath>
+      <itemPath>Temperature/TEMP_MANAGER.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

@@ -60,12 +60,12 @@ static void (*ADC1_DefaultInterruptHandler)(void) = NULL;
 
 void ADC1_Initialize (void)
 {
-    // ASAM disabled; DONE disabled; FORM Integer 16-bit; SAMP disabled; SSRC Clearing sample bit ends sampling and starts conversion; SIDL disabled; MODE12 10-bit; ON enabled; 
-    AD1CON1 = 0x8000;
+    // ASAM enabled; DONE disabled; FORM Integer 16-bit; SAMP disabled; SSRC Clearing sample bit ends sampling and starts conversion; SIDL disabled; MODE12 10-bit; ON enabled; 
+    AD1CON1 = 0x8004;
     // CSCNA disabled; BUFM disabled; SMPI Generates interrupt after completion of every sample/conversion operation; OFFCAL disabled; VCFG AVDD/AVSS; BUFREGEN disabled; 
     AD1CON2 = 0x00;
-    // SAMC 1; EXTSAM disabled; ADRC FRC; ADCS 0; 
-    AD1CON3 = 0x8100;
+    // SAMC 4; EXTSAM disabled; ADRC PBCLK; ADCS 3; 
+    AD1CON3 = 0x403;
     // CH0SA AN0; CH0NA AVSS; 
     AD1CHS = 0x00;
     // CSS9 disabled; CSS8 disabled; CSS7 disabled; CSS6 disabled; CSS5 disabled; CSS4 disabled; CSS3 disabled; CSS2 disabled; CSS15 disabled; CSS1 disabled; CSS14 disabled; CSS0 disabled; CSS13 disabled; CSS12 disabled; CSS11 disabled; CSS10 disabled; CSS30 disabled; CSS19 disabled; CSS18 disabled; CSS29 disabled; CSS17 disabled; CSS28 disabled; CSS16 disabled; CSS27 disabled; 
