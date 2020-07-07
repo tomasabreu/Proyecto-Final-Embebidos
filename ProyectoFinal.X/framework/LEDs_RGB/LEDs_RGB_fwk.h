@@ -164,6 +164,9 @@ extern "C" {
      */
 void RGB_setLedColor( uint8_t p_index, enum rgb_colors p_color );
 
+
+void RGB_setAllColor(int num_Led,enum rgb_colors p_color);
+
 void RGB_showLeds( uint8_t p_qty );
 
     /* Provide C++ Compatibility */

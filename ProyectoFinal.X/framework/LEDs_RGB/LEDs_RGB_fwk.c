@@ -155,6 +155,12 @@ void RGB_setLedColor( uint8_t p_index, enum rgb_colors p_color ){
     }
 }
 
+void RGB_setAllColor(int num_Led,enum rgb_colors p_color){
+    int i;
+    for(i = 0; i < num_Led; i++){RGB_setLedColor(i, p_color);}
+}
+
+
 void RGB_showLeds( uint8_t p_qty ){
     if(p_qty>LED_RGB_SIZE){
         p_qty=LED_RGB_SIZE;

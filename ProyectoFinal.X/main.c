@@ -93,35 +93,44 @@ void blinkLED(void *p_param) {
     ADC1_ChannelSelect(TEMP);
     for (;;) {
         if (BTN1_GetValue()) {
-            BTN1_pressed = true;
-            finishedTemperature = 0;
+            if (BTN1_pressed) {
+                BTN1_pressed = false;
+                break;
+            }
+            else{
+                BTN1_pressed = true;
+                finishedTemperature = 0;
+            }
         }
         if (!BTN1_GetValue() && BTN1_pressed) {
             for (counterPressed = 0; counterPressed < 10; counterPressed++) {
+                if (BTN1_GetValue()) {
+                    RGB_setAllColor(8,RGB_BLACK);
+                    RGB_showLeds(8);
+                    break;
+                }
                 if (counterPressed % 2 == 0) {
-                    for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLUE);
-                } else {
-                    for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLACK);
+                    RGB_setAllColor(8,RGB_BLUE);  
+                } 
+                else {
+                    RGB_setAllColor(8,RGB_BLACK);
                 }
                 finishedTemperature += getTemperature();
                 vTaskDelay(pdMS_TO_TICKS(240));
                 RGB_showLeds(8);
-                if (BTN1_GetValue()) {
-                    BTN1_pressed = false;
-                    break;
-                }
             }
-            if (counterPressed == 10) {
+            if (counterPressed >= 10) {
                 finishedTemperature /= 10;
                 if (finishedTemperature > 37) {
-                    for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_RED);
-                } else {
-                    for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_GREEN);
+                    RGB_setAllColor(8,RGB_RED);
+                } 
+                else {
+                    RGB_setAllColor(8,RGB_GREEN);
                 }
                 RGB_showLeds(8);
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
-                for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLACK);
+                RGB_setAllColor(8,RGB_BLACK);
                 RGB_showLeds(8);
             }
         }
