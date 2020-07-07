@@ -87,37 +87,45 @@ int main(void) {
 
 void blinkLED(void *p_param) {
     // Add your code here
-    uint8_t i, counterPressed, finishedTemperature;
+    uint8_t i, counterPressed;
+    uint16_t finishedTemperature;
     bool BTN1_pressed = false;
     ADC1_ChannelSelect(TEMP);
     for (;;) {
-        USB_checkStatus();
         if (BTN1_GetValue()) {
-            BTN1_pressed = !BTN1_pressed;
-            counterPressed=0;
-            finishedTemperature=0;
-        } else if (BTN1_pressed && counterPressed<10) {
-            if(counterPressed%2==0){
-                for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLUE);
+            BTN1_pressed = true;
+            finishedTemperature = 0;
+        }
+        if (!BTN1_GetValue() && BTN1_pressed) {
+            for (counterPressed = 0; counterPressed < 10; counterPressed++) {
+                if (counterPressed % 2 == 0) {
+                    for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLUE);
+                } else {
+                    for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLACK);
+                }
+                finishedTemperature += getTemperature();
+                vTaskDelay(pdMS_TO_TICKS(240));
+                RGB_showLeds(8);
+                if (BTN1_GetValue()) {
+                    BTN1_pressed = false;
+                    break;
+                }
             }
-            else{
+            if (counterPressed == 10) {
+                finishedTemperature /= 10;
+                if (finishedTemperature > 37) {
+                    for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_RED);
+                } else {
+                    for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_GREEN);
+                }
+                RGB_showLeds(8);
+                BTN1_pressed = false;
+                vTaskDelay(pdMS_TO_TICKS(2000));
                 for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_BLACK);
+                RGB_showLeds(8);
             }
-            finishedTemperature+= getTemperature();
-            vTaskDelay(pdMS_TO_TICKS(240));
-            RGB_showLeds(8);
-            counterPressed++;
         }
-        else if (BTN1_pressed && counterPressed==10){
-            finishedTemperature /=10;
-            if(finishedTemperature>37){
-                for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_RED);
-            }
-            else{
-                for (i = 0; i < 8; i++)RGB_setLedColor(i, RGB_GREEN);
-            }
-            vTaskDelay(pdMS_TO_TICKS(2000));
-        }
+        BTN1_pressed = false;
     }
 }
 

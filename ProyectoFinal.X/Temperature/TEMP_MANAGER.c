@@ -73,7 +73,7 @@ uint8_t getTemperature() {
     ADC1_SoftwareTriggerEnable();
     vTaskDelay(pdMS_TO_TICKS(10));
     ADC1_SoftwareTriggerDisable();
-    return temperatureConversor(ADC1_ConversionResultGet(TEMP));
+    return temperatureConversor(ADC1_ConversionResultGet(TEMP))+32;
 }
 
 
