@@ -64,6 +64,7 @@
 
 void takeTemperature(void *p_param);
 void temperatureSwitch(void *p_param);
+void sendUsbTemperature(void *p_param);
 static bool BTN1_pressed = false;
 
 /*
@@ -72,10 +73,11 @@ static bool BTN1_pressed = false;
 int main(void) {
     // initialize the device
     SYSTEM_Initialize();
-
     /* Create the tasks defined within this file. */
-    xTaskCreate(takeTemperature, "Take Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(temperatureSwitch, "Take Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(sendUsbTemperature, "Take Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+//    xTaskCreate(takeTemperature, "Take Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+//    xTaskCreate(temperatureSwitch, "Take Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+
     /* Finally start the scheduler. */
     vTaskStartScheduler();
 
@@ -100,11 +102,22 @@ void temperatureSwitch(void *p_param) {
     }
 }
 
+void sendUsbTemperature(void *p_param) {
+    for (;;) {
+        USB_checkStatus();
+        if (USB_getConnectedStatus()) {
+            
+            sprintf(usb_writeBuffer,"%d\n",getTemperature());
+            USB_send(usb_writeBuffer);
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+    }
+}
+
 void takeTemperature(void *p_param) {
     // Add your code here
     uint8_t i, counterPressed;
     uint16_t finishedTemperature;
-    ADC1_ChannelSelect(TEMP);
     for (;;) {
         if (BTN1_pressed) {
             for (counterPressed = 0; counterPressed < 10; counterPressed++) {

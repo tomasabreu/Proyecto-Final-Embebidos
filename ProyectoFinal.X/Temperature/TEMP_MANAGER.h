@@ -72,7 +72,7 @@ extern "C" {
         banner.
      */
     
-    uint8_t getTemperature();
+    uint16_t getTemperature();
 
 
     /* Provide C++ Compatibility */

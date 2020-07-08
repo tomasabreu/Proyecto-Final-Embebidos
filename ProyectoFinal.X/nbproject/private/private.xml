@@ -3,11 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/framework/USB/USB_fwk.c</file>
             <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/Temperature/TEMP_MANAGER.c</file>
-            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/platform/WS2812.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/freeRTOS/tasks.c</file>
             <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/main.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/mcc_generated_files/adc1.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/mcc_generated_files/exceptions.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/mcc_generated_files/system.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/framework/USB/USB_fwk.h</file>
             <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/Temperature/TEMP_MANAGER.h</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/mcc_generated_files/usb/usb_device.c</file>
         </group>
     </open-files>
 </project-private>

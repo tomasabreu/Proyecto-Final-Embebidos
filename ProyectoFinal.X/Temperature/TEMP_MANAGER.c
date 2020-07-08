@@ -25,6 +25,8 @@
  */
 
 /* TODO:  Include other files here if needed. */
+#include <stdio.h>
+
 #include "TEMP_MANAGER.h"
 #include "FreeRTOS.h"
 #include "../mcc_generated_files/adc1.h"
@@ -53,9 +55,6 @@
 
 /* ************************************************************************** */
 
-uint8_t temperatureConversor(uint16_t adcNumber) {
-    return adcNumber * 10 / 1023;
-}
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -69,11 +68,8 @@ uint8_t temperatureConversor(uint16_t adcNumber) {
 
 // *****************************************************************************
 
-uint8_t getTemperature() {
-    ADC1_SoftwareTriggerEnable();
-    vTaskDelay(pdMS_TO_TICKS(10));
-    ADC1_SoftwareTriggerDisable();
-    return temperatureConversor(ADC1_ConversionResultGet(TEMP))+32;
+uint16_t getTemperature() {
+    return ADC1_GetConversion(TEMP)*10/1023.0+32.0;
 }
 
 

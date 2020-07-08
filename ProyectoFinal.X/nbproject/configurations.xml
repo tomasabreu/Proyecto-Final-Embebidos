@@ -38,7 +38,6 @@
         <itemPath>mcc_generated_files/system.h</itemPath>
         <itemPath>mcc_generated_files/rtcc.h</itemPath>
         <itemPath>mcc_generated_files/adc1.h</itemPath>
-        <itemPath>mcc_generated_files/adc_module_features.h</itemPath>
       </logicalFolder>
       <itemPath>FreeRTOSConfig.h</itemPath>
       <itemPath>SIM808/SIM808.h</itemPath>
@@ -112,12 +111,14 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>snap</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>2.40</languageToolchainVersion>
+        <languageToolchainVersion>2.41</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <packs>
         <pack name="PIC32MM-GPM-0XX_DFP" vendor="Microchip" version="1.2.31"/>
       </packs>
+      <ScriptingSettings>
+      </ScriptingSettings>
       <compileType>
         <linkerTool>
           <linkerLibItems>
