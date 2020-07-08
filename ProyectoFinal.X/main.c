@@ -62,7 +62,9 @@
 #include "mcc_generated_files/adc1.h"
 #include "Temperature/TEMP_MANAGER.h"
 
-void blinkLED(void *p_param);
+void takeTemperature(void *p_param);
+void temperatureSwitch(void *p_param);
+static bool BTN1_pressed = false;
 
 /*
                          Main application
@@ -72,8 +74,8 @@ int main(void) {
     SYSTEM_Initialize();
 
     /* Create the tasks defined within this file. */
-    xTaskCreate(blinkLED, "task1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-
+    xTaskCreate(takeTemperature, "Take Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(temperatureSwitch, "Take Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     /* Finally start the scheduler. */
     vTaskStartScheduler();
 
@@ -85,56 +87,53 @@ int main(void) {
     for (;;);
 }
 
-void blinkLED(void *p_param) {
+void temperatureSwitch(void *p_param) {
+    for (;;) {
+        if (BTN1_GetValue()) {
+            BTN1_pressed = !BTN1_pressed;
+            RGB_setAllColor(8, RGB_BLACK);
+            RGB_showLeds(8);
+            while (BTN1_GetValue()) {
+                vTaskDelay(pdMS_TO_TICKS(100));
+            }
+        }
+    }
+}
+
+void takeTemperature(void *p_param) {
     // Add your code here
     uint8_t i, counterPressed;
     uint16_t finishedTemperature;
-    bool BTN1_pressed = false;
     ADC1_ChannelSelect(TEMP);
     for (;;) {
-        if (BTN1_GetValue()) {
-            if (BTN1_pressed) {
-                BTN1_pressed = false;
-                break;
-            }
-            else{
-                BTN1_pressed = true;
-                finishedTemperature = 0;
-            }
-        }
-        if (!BTN1_GetValue() && BTN1_pressed) {
+        if (BTN1_pressed) {
             for (counterPressed = 0; counterPressed < 10; counterPressed++) {
-                if (BTN1_GetValue()) {
-                    RGB_setAllColor(8,RGB_BLACK);
-                    RGB_showLeds(8);
+                if (!BTN1_pressed) {
                     break;
                 }
                 if (counterPressed % 2 == 0) {
-                    RGB_setAllColor(8,RGB_BLUE);  
-                } 
-                else {
-                    RGB_setAllColor(8,RGB_BLACK);
+                    RGB_setAllColor(8, RGB_BLUE);
+                } else {
+                    RGB_setAllColor(8, RGB_BLACK);
                 }
-                finishedTemperature += getTemperature();
+                finishedTemperature += getTemperature(); //Temperature has a 10 ms delay
                 vTaskDelay(pdMS_TO_TICKS(240));
                 RGB_showLeds(8);
             }
-            if (counterPressed >= 10) {
+            if (counterPressed == 10) {
                 finishedTemperature /= 10;
                 if (finishedTemperature > 37) {
-                    RGB_setAllColor(8,RGB_RED);
-                } 
-                else {
-                    RGB_setAllColor(8,RGB_GREEN);
+                    RGB_setAllColor(8, RGB_RED);
+                } else {
+                    RGB_setAllColor(8, RGB_GREEN);
                 }
                 RGB_showLeds(8);
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
-                RGB_setAllColor(8,RGB_BLACK);
+                RGB_setAllColor(8, RGB_BLACK);
                 RGB_showLeds(8);
             }
         }
-        BTN1_pressed = false;
     }
 }
 
