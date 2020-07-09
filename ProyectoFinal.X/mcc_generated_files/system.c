@@ -85,9 +85,10 @@
 #include "system.h"
 #include "interrupt_manager.h"
 #include "exceptions.h"
-#include "rtcc.h"
 #include "usb/usb.h"
+#include "rtcc.h"
 #include "adc1.h"
+#include "uart1.h"
 
 void SYSTEM_Initialize(void)
 {
@@ -95,6 +96,7 @@ void SYSTEM_Initialize(void)
     INTERRUPT_Initialize();
     CLOCK_Initialize();
     USBDeviceInit();
+    UART1_Initialize();
     ADC1_Initialize();
     USBDeviceAttach();
     RTCC_Initialize();

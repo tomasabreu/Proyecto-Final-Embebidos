@@ -26,6 +26,7 @@
 
 /* TODO:  Include other files here if needed. */
 #include <stdio.h>
+#include <math.h>
 
 #include "TEMP_MANAGER.h"
 #include "FreeRTOS.h"
@@ -41,8 +42,7 @@
     banner.
  */
 
-
-
+double temperature;
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Local Functions                                                   */
@@ -55,7 +55,9 @@
 
 /* ************************************************************************** */
 
-
+double round(double x) {
+    return floor(x + 0.5f);
+} // Math.h doesn't have this function.
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Interface Functions                                               */
@@ -68,11 +70,22 @@
 
 // *****************************************************************************
 
-uint16_t getTemperature() {
-    return ADC1_GetConversion(TEMP)*10/1023.0+32.0;
+void measureTemperature() {
+    temperature += (ADC1_GetConversion(TEMP) / 102.3) + 32;
 }
 
+float getTemperature() {
+    return temperature;
+}
 
+void averageTemperature() {
+    temperature /= 10;
+    temperature = round(10 * temperature) / 10;
+}
+
+void resetTemperature() {
+    temperature = 0;
+}
 /* *****************************************************************************
  End of File
  */

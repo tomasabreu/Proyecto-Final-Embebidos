@@ -61,7 +61,6 @@ extern "C" {
      */
 
 
-
     // *****************************************************************************
     // *****************************************************************************
     // Section: Interface Functions
@@ -71,10 +70,11 @@ extern "C" {
     /*  A brief description of a section can be given directly below the section
         banner.
      */
-    
-    uint16_t getTemperature();
 
-
+    void measureTemperature();
+    float getTemperature();
+    void resetTemperature();
+    void averageTemperature();
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }
