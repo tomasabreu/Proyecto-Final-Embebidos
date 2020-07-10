@@ -85,7 +85,7 @@ int main(void) {
     xTaskCreate(takeTemperature, "Take temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(temperatureSwitch, "Switch temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(getRealTime, "Get real time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
-    xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, NULL);
+    xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(SIM808_initModule, "modemIni", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, &modemInitHandle);
     /* Finally start the scheduler. */
     vTaskStartScheduler();
@@ -127,7 +127,6 @@ void takeTemperature(void *p_param) {
     // Add your code here
     uint8_t i, counterPressed;
     for (;;) {
-        USB_checkStatus();
         if (BTN1_pressed) {
             resetTemperature();
             for (counterPressed = 0; counterPressed < 10; counterPressed++) {
@@ -159,6 +158,7 @@ void takeTemperature(void *p_param) {
                 RGB_showLeds(8);
             }
         }
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 

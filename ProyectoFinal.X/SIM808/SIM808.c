@@ -289,7 +289,6 @@ void SIM808_taskCheck( void* p_param ){
             xSemaphoreTake( c_semGPSIsReady, pdMS_TO_TICKS( 10 ) );
             xSemaphoreTake( c_semGSMIsReady, pdMS_TO_TICKS( 10 ) );
         }
-        vTaskDelay(pdMS_TO_TICKS( 1000));
     }
 }
 
