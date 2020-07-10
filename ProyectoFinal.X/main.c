@@ -150,6 +150,9 @@ void takeTemperature(void *p_param) {
                     RGB_setAllColor(8, RGB_GREEN);
                 }
                 sprintf(usb_writeBuffer, "La temperatura medida es: %.1f\n", getTemperature());
+                while (TaskHandle_SendUSB!=NULL && eTaskGetState(&TaskHandle_SendUSB) != eDeleted) {
+                    vTaskDelay(pdMS_TO_TICKS(100));
+                }
                 xTaskCreate(sendUsb, "Send Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &TaskHandle_SendUSB);
                 RGB_showLeds(8);
                 BTN1_pressed = false;
@@ -166,21 +169,22 @@ void getRealTime(void *p_param) {
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t nmea[256];
     for (;;) {
-        if (c_semGPSIsReady == NULL) {
-            vTaskDelay(pdMS_TO_TICKS(100));
-            continue;
-        }
-        xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY);        
-        if (SIM808_getNMEA(nmea)) {
-            if (SIM808_validateNMEAFrame(nmea)) {
-                GPS_getUTC(&time, nmea);
-                RTCC_TimeSet(&time);
-                time_t timeToShow = mktime(&time);
-                sprintf(usb_writeBuffer, "\nEl tiempo es: %s", ctime(&timeToShow));
-                xTaskCreate(sendUsb, "Send Real Time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &TaskHandle_SendUSB);
+        if( xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY)==pdTRUE ){
+            if (SIM808_getNMEA(nmea)) {
+                if (SIM808_validateNMEAFrame(nmea)) {
+                    GPS_getUTC(&time, nmea);
+                    RTCC_TimeSet(&time);
+                    time_t timeToShow = mktime(&time);
+                    sprintf(usb_writeBuffer, "\nEl tiempo es: %s", ctime(&timeToShow));
+                    while (TaskHandle_SendUSB!=NULL && eTaskGetState(&TaskHandle_SendUSB) != eDeleted) {
+                    vTaskDelay(pdMS_TO_TICKS(100));
+                }
+                    xTaskCreate(sendUsb, "Send Real Time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &TaskHandle_SendUSB);
+                }
             }
+            xSemaphoreGive(c_semGPSIsReady);
         }
-        xSemaphoreGive(c_semGPSIsReady);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
