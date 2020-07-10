@@ -279,6 +279,7 @@ void SIM808_taskCheck( void* p_param ){
             if( UART1_IsRxReady( ) ){
                 xSemaphoreGive( c_semRxIsDataAvailable );
             }
+            
         }
         else{
             // Deshabilito todos los semáforos, si los hubiera libres
@@ -288,6 +289,7 @@ void SIM808_taskCheck( void* p_param ){
             xSemaphoreTake( c_semGPSIsReady, pdMS_TO_TICKS( 10 ) );
             xSemaphoreTake( c_semGSMIsReady, pdMS_TO_TICKS( 10 ) );
         }
+        vTaskDelay(pdMS_TO_TICKS( 1000));
     }
 }
 

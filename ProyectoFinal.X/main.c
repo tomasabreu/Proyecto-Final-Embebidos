@@ -81,12 +81,12 @@ int main(void) {
     SYSTEM_Initialize();
     /* Create the tasks defined within this file. */
     //    
-    
+
     xTaskCreate(takeTemperature, "Take temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(temperatureSwitch, "Switch temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(getRealTime, "Get real time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
-    xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(SIM808_initModule, "modemIni", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, &modemInitHandle);
+    xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, NULL);
+    xTaskCreate(SIM808_initModule, "modemIni", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, &modemInitHandle);
     /* Finally start the scheduler. */
     vTaskStartScheduler();
 
@@ -164,20 +164,23 @@ void takeTemperature(void *p_param) {
 
 void getRealTime(void *p_param) {
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    uint8_t nmea[256];
     for (;;) {
-        if(c_semGPSIsReady==NULL){
+        if (c_semGPSIsReady == NULL) {
             vTaskDelay(pdMS_TO_TICKS(100));
             continue;
         }
-        xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY);
-        uint8_t nmea;
-        if (SIM808_getNMEA(&nmea) && SIM808_validateNMEAFrame(&nmea)) {
-            GPS_getUTC(&time, &nmea);
-            RTCC_TimeSet(&time);
+        xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY);        
+        if (SIM808_getNMEA(nmea)) {
+            if (SIM808_validateNMEAFrame(nmea)) {
+                GPS_getUTC(&time, nmea);
+                RTCC_TimeSet(&time);
+                time_t timeToShow = mktime(&time);
+                sprintf(usb_writeBuffer, "\nEl tiempo es: %s", ctime(&timeToShow));
+                xTaskCreate(sendUsb, "Send Real Time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &TaskHandle_SendUSB);
+            }
         }
-        time_t timeToShow = mktime(&time);
-        sprintf(usb_writeBuffer, "\nEl tiempo es: %s", ctime(&timeToShow));
-        xTaskCreate(sendUsb, "Send Real Time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &TaskHandle_SendUSB);
+        xSemaphoreGive(c_semGPSIsReady);
     }
 }
 
