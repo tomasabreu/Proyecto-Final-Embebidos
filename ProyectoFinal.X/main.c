@@ -67,10 +67,8 @@
 
 void takeTemperature(void *p_param);
 void temperatureSwitch(void *p_param);
-void sendUsb(void *p_param);
 void getRealTime(void *p_param);
 
-TaskHandle_t TaskHandle_SendUSB;
 static bool BTN1_pressed = false;
 
 /*
@@ -112,7 +110,7 @@ void temperatureSwitch(void *p_param) {
     }
 }
 
-void sendUsb(void *p_param) {
+void sendUsb(void) {
     for (;;) {
         USB_checkStatus();
         if (USB_getConnectedStatus() && USB_send(usb_writeBuffer)) {
@@ -120,7 +118,6 @@ void sendUsb(void *p_param) {
         }
         vTaskDelay(pdMS_TO_TICKS(10));
     }
-    vTaskDelete(TaskHandle_SendUSB);
 }
 
 void takeTemperature(void *p_param) {
@@ -150,10 +147,7 @@ void takeTemperature(void *p_param) {
                     RGB_setAllColor(8, RGB_GREEN);
                 }
                 sprintf(usb_writeBuffer, "La temperatura medida es: %.1f\n", getTemperature());
-                while (TaskHandle_SendUSB!=NULL && eTaskGetState(&TaskHandle_SendUSB) != eDeleted) {
-                    vTaskDelay(pdMS_TO_TICKS(100));
-                }
-                xTaskCreate(sendUsb, "Send Temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &TaskHandle_SendUSB);
+                sendUsb();
                 RGB_showLeds(8);
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
@@ -176,10 +170,7 @@ void getRealTime(void *p_param) {
                     RTCC_TimeSet(&time);
                     time_t timeToShow = mktime(&time);
                     sprintf(usb_writeBuffer, "\nEl tiempo es: %s", ctime(&timeToShow));
-                    while (TaskHandle_SendUSB!=NULL && eTaskGetState(&TaskHandle_SendUSB) != eDeleted) {
-                    vTaskDelay(pdMS_TO_TICKS(100));
-                }
-                    xTaskCreate(sendUsb, "Send Real Time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &TaskHandle_SendUSB);
+                    sendUsb();
                 }
             }
             xSemaphoreGive(c_semGPSIsReady);
