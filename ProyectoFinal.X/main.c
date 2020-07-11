@@ -110,10 +110,10 @@ void temperatureSwitch(void *p_param) {
     }
 }
 
-void sendUsb(void) {
+void sendUsb(char* sendText) {
     for (;;) {
         USB_checkStatus();
-        if (USB_getConnectedStatus() && USB_send(usb_writeBuffer)) {
+        if (USB_getConnectedStatus() && USB_send(sendText)) {
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(10));
@@ -123,6 +123,7 @@ void sendUsb(void) {
 void takeTemperature(void *p_param) {
     // Add your code here
     uint8_t i, counterPressed;
+    char textToSend[64];
     for (;;) {
         if (BTN1_pressed) {
             resetTemperature();
@@ -146,8 +147,8 @@ void takeTemperature(void *p_param) {
                 } else {
                     RGB_setAllColor(8, RGB_GREEN);
                 }
-                sprintf(usb_writeBuffer, "La temperatura medida es: %.1f\n", getTemperature());
-                sendUsb();
+                sprintf(textToSend, "La temperatura medida es: %.1f\n", getTemperature());
+                sendUsb(textToSend);
                 RGB_showLeds(8);
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
@@ -160,17 +161,19 @@ void takeTemperature(void *p_param) {
 }
 
 void getRealTime(void *p_param) {
+    time_t timeToShow;
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t nmea[256];
+    char textToSend[64];
     for (;;) {
-        if( xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY)==pdTRUE ){
+        if(c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY)==pdTRUE  ){
             if (SIM808_getNMEA(nmea)) {
                 if (SIM808_validateNMEAFrame(nmea)) {
                     GPS_getUTC(&time, nmea);
                     RTCC_TimeSet(&time);
-                    time_t timeToShow = mktime(&time);
-                    sprintf(usb_writeBuffer, "\nEl tiempo es: %s", ctime(&timeToShow));
-                    sendUsb();
+                    timeToShow = mktime(&time);
+                    sprintf(textToSend, "\nEl tiempo es: %s", ctime(&timeToShow));
+                    sendUsb(textToSend);
                 }
             }
             xSemaphoreGive(c_semGPSIsReady);

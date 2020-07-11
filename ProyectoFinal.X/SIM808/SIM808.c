@@ -434,5 +434,5 @@ bool SIM808_validateNMEAFrame( uint8_t *p_frame ){
     //  voy hasta el final de +CGNSINF: 
     index += strlen(ATRES_GPS_INFO)+1;
 
-    return( *(index+2)=='1');
+    return( *(index)=='1');
 }
