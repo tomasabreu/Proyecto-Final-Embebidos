@@ -75,6 +75,9 @@ extern "C" {
     float getTemperature();
     void resetTemperature();
     void averageTemperature();
+    bool saveTemperature(float temperature);
+    void setThreshold(int temperature);
+    bool checkThreshold();
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }

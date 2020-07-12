@@ -68,7 +68,8 @@
 void takeTemperature(void *p_param);
 void temperatureSwitch(void *p_param);
 void getRealTime(void *p_param);
-
+void sendUsb(void *p_param);
+xTaskHandle sendUsbHandle;
 static bool BTN1_pressed = false;
 
 /*
@@ -86,6 +87,7 @@ int main(void) {
     xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(SIM808_initModule, "modemIni", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, &modemInitHandle);
     /* Finally start the scheduler. */
+
     vTaskStartScheduler();
 
     /* If all is well, the scheduler will now be running, and the following line
@@ -110,20 +112,20 @@ void temperatureSwitch(void *p_param) {
     }
 }
 
-void sendUsb(char* sendText) {
+void sendUsb(void *p_param) {
     for (;;) {
         USB_checkStatus();
-        if (USB_getConnectedStatus() && USB_send(sendText)) {
+        if (USB_getConnectedStatus() && USB_send(usb_writeBuffer)) {
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(10));
     }
+    vTaskDelete(sendUsbHandle);
 }
 
 void takeTemperature(void *p_param) {
     // Add your code here
     uint8_t i, counterPressed;
-    char textToSend[64];
     for (;;) {
         if (BTN1_pressed) {
             resetTemperature();
@@ -142,13 +144,26 @@ void takeTemperature(void *p_param) {
             }
             if (counterPressed == 10) {
                 averageTemperature();
-                if (getTemperature() > 37) {
-                    RGB_setAllColor(8, RGB_RED);
-                } else {
+                if (checkThreshold()) {
                     RGB_setAllColor(8, RGB_GREEN);
+                } else {
+                    RGB_setAllColor(8, RGB_RED);
                 }
-                sprintf(textToSend, "La temperatura medida es: %.1f\n", getTemperature());
-                sendUsb(textToSend);
+                while (sendUsbHandle != NULL && eTaskStateGet(sendUsbHandle) != eDeleted) {
+                    vTaskDelay(pdMS_TO_TICKS(10));
+                }
+                sprintf(usb_writeBuffer, "La temperatura medida es: %.1f\n", getTemperature());
+                xTaskCreate(sendUsb, "Send usb", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &sendUsbHandle);
+                while (sendUsbHandle != NULL && eTaskStateGet(sendUsbHandle) != eDeleted) {
+                    vTaskDelay(pdMS_TO_TICKS(10));
+                }
+                if(saveTemperature(getTemperature())){
+                    strcpy(usb_writeBuffer,"Temperatura guardada correctamente.\n");
+                }
+                else{
+                    strcpy(usb_writeBuffer,"No se pudo guardar la temperatura, memoria llena.\n");
+                }
+                xTaskCreate(sendUsb, "Send usb", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &sendUsbHandle);
                 RGB_showLeds(8);
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
@@ -163,17 +178,19 @@ void takeTemperature(void *p_param) {
 void getRealTime(void *p_param) {
     time_t timeToShow;
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    uint8_t nmea[256];
-    char textToSend[64];
+    uint8_t nmea[64];
     for (;;) {
-        if(c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY)==pdTRUE  ){
+        if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
                 if (SIM808_validateNMEAFrame(nmea)) {
                     GPS_getUTC(&time, nmea);
                     RTCC_TimeSet(&time);
                     timeToShow = mktime(&time);
-                    sprintf(textToSend, "\nEl tiempo es: %s", ctime(&timeToShow));
-                    sendUsb(textToSend);
+                    while (sendUsbHandle != NULL && eTaskStateGet(sendUsbHandle) != eDeleted) {
+                        vTaskDelay(pdMS_TO_TICKS(10));
+                    }
+                    sprintf(usb_writeBuffer, "\nEl tiempo es: %s", ctime(&timeToShow));
+                    xTaskCreate(sendUsb, "Send usb", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &sendUsbHandle);
                 }
             }
             xSemaphoreGive(c_semGPSIsReady);

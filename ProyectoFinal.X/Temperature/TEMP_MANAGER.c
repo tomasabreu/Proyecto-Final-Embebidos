@@ -41,8 +41,11 @@
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-
+int amountOfSaveTemperatures = 20;
+int thresholdTemperature = 37;
 double temperature;
+float temperatures[amountOfSaveTemperatures];
+int lastTemperatureSaved = 0;
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Local Functions                                                   */
@@ -86,6 +89,25 @@ void averageTemperature() {
 void resetTemperature() {
     temperature = 0;
 }
+
+bool saveTemperature(float temperature) {
+    lastTemperatureSaved++;
+    if (lastTemperatureSaved < amountOfSaveTemperatures) {
+        temperatures[index] = temperature;
+        return true;
+    }
+    return false;
+}
+
+void setThreshold(int temperature) {
+    thresholdTemperature = temperature;
+}
+
+bool checkThreshold() {
+    return temperature<=thresholdTemperature;
+}
+
+
 /* *****************************************************************************
  End of File
  */
