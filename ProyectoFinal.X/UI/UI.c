@@ -1,0 +1,193 @@
+/* ************************************************************************** */
+/** Descriptive File Name
+
+  @Company
+    Company Name
+
+  @File Name
+    filename.c
+
+  @Summary
+    Brief description of the file.
+
+  @Description
+    Describe the purpose of this file.
+ */
+/* ************************************************************************** */
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+/* Section: Included Files                                                    */
+/* ************************************************************************** */
+/* ************************************************************************** */
+
+/* This section lists the other files that are included in this file.
+ */
+
+#include "UI.h"
+#include "../../framework/USB/USB_fwk.h"
+#include <string.h>
+#include <ctype.h>
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+/* Section: File Scope or Global Data                                         */
+/* ************************************************************************** */
+/* ************************************************************************** */
+
+/*  A brief description of a section can be given directly below the section
+    banner.
+ */
+
+/* ************************************************************************** */
+/** Descriptive Data Item Name
+
+  @Summary
+    Brief one-line summary of the data item.
+
+  @Description
+    Full description, explaining the purpose and usage of data item.
+    <p>
+    Additional description in consecutive paragraphs separated by HTML
+    paragraph breaks, as necessary.
+    <p>
+    Type "JavaDoc" in the "How Do I?" IDE toolbar for more information on tags.
+
+  @Remarks
+    Any additional remarks
+ */
+const uint8_t ui_welcomeText[] = "Bienvenido al calendario de eventos de Sistemas Embebidos\nPor favor presione una tecla para continuar...\n";
+const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Setear hora del sistema\n2) Consultar hora del sistema\n3) Control de eventos\n4) Consultar eventos activos\n";
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+// Section: Local Functions                                                   */
+/* ************************************************************************** */
+/* ************************************************************************** */
+
+/*  A brief description of a section can be given directly below the section
+    banner.
+ */
+
+/* ************************************************************************** */
+
+
+
+/* ************************************************************************** */
+/* ************************************************************************** */
+// Section: Interface Functions                                               */
+/* ************************************************************************** */
+/* ************************************************************************** */
+
+/*  A brief description of a section can be given directly below the section
+    banner.
+ */
+
+// *****************************************************************************
+
+void UI_showMenu(ws2812_t* array_led) {
+    static ui_menu_states_t menuState = UI_MENU_STATE_INIT_SHOW;
+    static uint8_t dataArray1[64];
+    static bool showWelcome = false;
+    if (USB_getConnectedStatus()) {
+        switch (menuState) {
+            case( UI_MENU_STATE_INIT_SHOW):
+                if (!showWelcome && UI_waitForInput(dataArray1))
+                    showWelcome = true;
+                if (showWelcome && USB_send((uint8_t*) ui_welcomeText)) {
+                    memset(dataArray1, 0, sizeof (dataArray1));
+                    menuState = UI_MENU_STATE_INIT_WAIT;
+                }
+                break;
+            case( UI_MENU_STATE_INIT_WAIT):
+                if (UI_waitForInput(dataArray1)) {
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                }
+                break;
+            case( UI_MENU_STATE_OPTIONS_SHOW):
+                if (USB_send((uint8_t*) ui_optionsText)) {
+                    memset(dataArray1, 0, sizeof (dataArray1));
+                    menuState = UI_MENU_STATE_OPTIONS_WAIT;
+                }
+                break;
+            case( UI_MENU_STATE_OPTIONS_WAIT):
+                if (UI_waitForInput(dataArray1)) {
+                    menuState = UI_MENU_STATE_OPTIONS_CHECK;
+                }
+                break;
+            case( UI_MENU_STATE_OPTIONS_CHECK):
+                if ((UI_checkValidOption(dataArray1, UI_OPTION_NUM, 4, 1))) {
+                    menuState = UI_MENU_STATE_OPTIONS_CHECK + atoi(dataArray1);
+                } else {
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                }
+                break;
+            case( UI_MENU_STATE_CHANGE_ID):
+                break;
+            case( UI_MENU_STATE_PHONE_CHANGE):
+                break;
+            case( UI_MENU_STATE_TEMPERATURE_THRESHOLD_CHANGE):
+                break;
+        }
+    } else {
+        menuState = UI_MENU_STATE_INIT_SHOW;
+    }
+}
+
+bool UI_waitForInput(uint8_t *p_dest) {
+    uint8_t bytesReceived;
+
+    bytesReceived = USB_receive(p_dest);
+    if (bytesReceived > 0) {
+        p_dest[bytesReceived] = '\0';
+        return true;
+    }
+    return false;
+}
+
+bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, uint32_t p_max, uint32_t p_min) {
+    uint32_t intValue;
+    uint32_t i;
+
+    switch (p_type) {
+        case UI_OPTION_NUM:
+            for (i = 0; i < strlen(p_src); i++) {
+                if (isdigit(p_src[i]) == 0) {
+                    return false;
+                }
+            }
+            intValue = atoi(p_src);
+            if ((intValue < p_min) || (intValue > p_max)) {
+                return false;
+            }
+            break;
+
+        case UI_OPTION_ALPHANUM:
+            for (i = 0; i < strlen(p_src); i++) {
+                if (isalnum(p_src[i]) == 0) {
+                    return false;
+                }
+            }
+            if (strlen(p_src) > p_max) {
+                return false;
+            }
+            break;
+
+        case UI_OPTION_ALPHA:
+            for (i = 0; i < strlen(p_src); i++) {
+                if (isalpha(p_src[i]) == 0) {
+                    return false;
+                }
+            }
+            if (strlen(p_src) > p_max) {
+                return false;
+            }
+            break;
+    }
+    return true;
+}
+
+
+/* *****************************************************************************
+ End of File
+ */

@@ -113,10 +113,12 @@ void temperatureSwitch(void *p_param) {
 void sendUsb(char* sendText) {
     for (;;) {
         USB_checkStatus();
-        if (USB_getConnectedStatus() && USB_send(sendText)) {
-            break;
+        if (USB_getConnectedStatus()) {
+            if(USB_send(sendText)){
+                break;
+            }
         }
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 
@@ -149,6 +151,7 @@ void takeTemperature(void *p_param) {
                 }
                 sprintf(textToSend, "La temperatura medida es: %.1f\n", getTemperature());
                 sendUsb(textToSend);
+                vTaskDelay(pdMS_TO_TICKS(100));
                 RGB_showLeds(8);
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
@@ -164,7 +167,7 @@ void getRealTime(void *p_param) {
     time_t timeToShow;
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t nmea[256];
-    char textToSend[64];
+    static char textToSend[64];
     for (;;) {
         if(c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY)==pdTRUE  ){
             if (SIM808_getNMEA(nmea)) {
