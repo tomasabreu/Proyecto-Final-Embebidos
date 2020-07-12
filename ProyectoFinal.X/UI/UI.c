@@ -85,10 +85,13 @@ const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Cambiar el um
 
 // *****************************************************************************
 
-void UI_showMenu(ws2812_t* array_led) {
+void UI_showMenu(void) {
     static ui_menu_states_t menuState = UI_MENU_STATE_INIT_SHOW;
     static uint8_t dataArray1[64];
     static bool showWelcome = false;
+    static bool needNewInput1 = false;
+    static int counter = 0;
+    USB_checkStatus();
     if (USB_getConnectedStatus()) {
         switch (menuState) {
             case( UI_MENU_STATE_INIT_SHOW):
@@ -116,13 +119,17 @@ void UI_showMenu(ws2812_t* array_led) {
                 }
                 break;
             case( UI_MENU_STATE_OPTIONS_CHECK):
-                if ((UI_checkValidOption(dataArray1, UI_OPTION_NUM, 4, 1))) {
+                if ((UI_checkValidOption(dataArray1, UI_OPTION_NUM, 3, 1))) {
                     menuState = UI_MENU_STATE_OPTIONS_CHECK + atoi(dataArray1);
                 } else {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
             case( UI_MENU_STATE_CHANGE_ID):
+                if (needNewInput1 && UI_waitForInput(dataArray1))
+                    needNewInput1 = false;
+                else if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1))
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 break;
             case( UI_MENU_STATE_PHONE_CHANGE):
                 break;
@@ -143,6 +150,27 @@ bool UI_waitForInput(uint8_t *p_dest) {
         return true;
     }
     return false;
+}
+
+bool switchID(int* counter, bool* needNewInput, char* dataArray) {
+    switch (*counter) {
+        case 0:
+            USB_send("\nIngrese el ID del dispositivo, número como maximo 4294967295\n");
+            (*counter)++;
+            return false;
+        case 1:
+            if (!(*needNewInput)) {
+                *needNewInput = true;
+                (*counter)++;
+                return false;
+            }
+        case 2:
+            sscanf(dataArray, "%d", &);
+            if (auxTimeNow >= auxTimeToSet)USB_send("\nTiempo Seteado\n");
+            else USB_send("\nTiempo NO Seteado\n");
+            *counter = 0;
+            return true;
+    }
 }
 
 bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, uint32_t p_max, uint32_t p_min) {

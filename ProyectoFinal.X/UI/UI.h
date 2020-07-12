@@ -171,7 +171,7 @@ extern "C" {
             return 3;
         }
      */
-    void UI_showMenu(ws2812_t* array_led);
+    void UI_showMenu(void);
 
     bool UI_waitForInput(uint8_t *p_dest);
 

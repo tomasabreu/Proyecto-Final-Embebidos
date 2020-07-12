@@ -28,6 +28,7 @@
 /* This section lists the other files that are included in this file.
  */
 #include "stdint.h"
+#include "stdbool.h"
 /* TODO:  Include other files here if needed. */
 
 

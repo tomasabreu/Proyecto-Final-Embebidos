@@ -47,6 +47,7 @@
       <itemPath>framework/USB/USB_fwk.h</itemPath>
       <itemPath>framework/LEDs_RGB/LEDs_RGB_fwk.h</itemPath>
       <itemPath>Temperature/TEMP_MANAGER.h</itemPath>
+      <itemPath>UI/UI.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -93,7 +94,6 @@
       <itemPath>framework/LEDs_RGB/LEDs_RGB_fwk.c</itemPath>
       <itemPath>Temperature/TEMP_MANAGER.c</itemPath>
       <itemPath>UI/UI.c</itemPath>
-      <itemPath>UI/UI.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -115,12 +115,14 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>snap</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>2.40</languageToolchainVersion>
+        <languageToolchainVersion>2.41</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <packs>
         <pack name="PIC32MM-GPM-0XX_DFP" vendor="Microchip" version="1.2.31"/>
       </packs>
+      <ScriptingSettings>
+      </ScriptingSettings>
       <compileType>
         <linkerTool>
           <linkerLibItems>

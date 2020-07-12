@@ -41,10 +41,10 @@
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-int amountOfSaveTemperatures = 20;
+#define amountOfSaveTemperatures 200
 int thresholdTemperature = 37;
 double temperature;
-float temperatures[amountOfSaveTemperatures];
+float savedTemperatures[amountOfSaveTemperatures];
 int lastTemperatureSaved = 0;
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -93,7 +93,7 @@ void resetTemperature() {
 bool saveTemperature(float temperature) {
     lastTemperatureSaved++;
     if (lastTemperatureSaved < amountOfSaveTemperatures) {
-        temperatures[index] = temperature;
+        savedTemperatures[lastTemperatureSaved] = temperature;
         return true;
     }
     return false;
