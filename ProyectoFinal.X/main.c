@@ -118,7 +118,7 @@ void sendUsb(void *p_param) {
         if (USB_getConnectedStatus() && USB_send(usb_writeBuffer)) {
             break;
         }
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
     vTaskDelete(sendUsbHandle);
 }

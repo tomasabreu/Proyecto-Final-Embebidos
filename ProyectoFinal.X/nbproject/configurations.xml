@@ -92,6 +92,8 @@
       <itemPath>framework/USB/USB_fwk.c</itemPath>
       <itemPath>framework/LEDs_RGB/LEDs_RGB_fwk.c</itemPath>
       <itemPath>Temperature/TEMP_MANAGER.c</itemPath>
+      <itemPath>UI/UI.c</itemPath>
+      <itemPath>UI/UI.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
