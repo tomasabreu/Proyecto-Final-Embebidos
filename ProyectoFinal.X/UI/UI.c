@@ -58,7 +58,7 @@
     Any additional remarks
  */
 const uint8_t ui_welcomeText[] = "Bienvenido al Proyecto de Sistemas Embebidos\nPor favor presione una tecla para continuar...\n";
-const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Cambiar el umbral de temperatura usado\n2) Cambiar el ID del dispositivo\n3) Cambiar el telefono al que se le manda el mensaje\n";
+const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Cambiar el ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono al que se le manda el mensaje\n";
 
 /* ************************************************************************** */
 /* ************************************************************************** */

@@ -48,6 +48,7 @@
       <itemPath>framework/LEDs_RGB/LEDs_RGB_fwk.h</itemPath>
       <itemPath>Temperature/TEMP_MANAGER.h</itemPath>
       <itemPath>UI/UI.h</itemPath>
+      <itemPath>PHONE_MANAGER.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -94,6 +95,7 @@
       <itemPath>framework/LEDs_RGB/LEDs_RGB_fwk.c</itemPath>
       <itemPath>Temperature/TEMP_MANAGER.c</itemPath>
       <itemPath>UI/UI.c</itemPath>
+      <itemPath>PHONE_MANAGER.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
