@@ -191,7 +191,7 @@ bool switchThreshold(int* counter, bool* needNewInput, char* dataArray) {
                 return false;
             }
         case 2:
-            setThreshold(dataArray
+            setThreshold((int) dataArray);
             USB_send("\nSe cambio Exitosamente la temperatura umbral\n");
             *counter = 0;
             return true;
