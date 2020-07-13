@@ -179,6 +179,8 @@ void takeTemperature(void *p_param) {
 void showMenu(void *p_param) {
     for (;;) {
         UI_showMenu();
+        vTaskDelay(pdMS_TO_TICKS(100));
+        
     }
 }
 
@@ -199,7 +201,7 @@ void getRealTime(void *p_param) {
             }
             xSemaphoreGive(c_semGPSIsReady);
         }
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 

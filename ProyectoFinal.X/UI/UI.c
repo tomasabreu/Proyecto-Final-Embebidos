@@ -26,6 +26,7 @@
 
 #include "UI.h"
 #include "../../framework/USB/USB_fwk.h"
+#include "../Temperature/TEMP_MANAGER.h"
 #include <string.h>
 #include <ctype.h>
 
@@ -126,14 +127,18 @@ void UI_showMenu(void) {
                 }
                 break;
             case( UI_MENU_STATE_CHANGE_ID):
-                if (needNewInput1 && UI_waitForInput(dataArray1))
-                    needNewInput1 = false;
-                else if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1))
-                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                //                if (needNewInput1 && UI_waitForInput(dataArray1))
+                //                    needNewInput1 = false;
+                //                else if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1))
+                //                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 break;
             case( UI_MENU_STATE_PHONE_CHANGE):
                 break;
             case( UI_MENU_STATE_TEMPERATURE_THRESHOLD_CHANGE):
+                if (needNewInput1 && UI_waitForInput(dataArray1))
+                    needNewInput1 = false;
+                else if (!needNewInput1 && switchThreshold(&counter, &needNewInput1, dataArray1))
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 break;
         }
     } else {
@@ -152,10 +157,31 @@ bool UI_waitForInput(uint8_t *p_dest) {
     return false;
 }
 
-bool switchID(int* counter, bool* needNewInput, char* dataArray) {
+//bool switchID(int* counter, bool* needNewInput, char* dataArray) {
+//    switch (*counter) {
+//        case 0:
+//            USB_send("\nIngrese el ID del dispositivo, número como maximo 4294967295\n");
+//            (*counter)++;
+//            return false;
+//        case 1:
+//            if (!(*needNewInput)) {
+//                *needNewInput = true;
+//                (*counter)++;
+//                return false;
+//            }
+//        case 2:
+//            sscanf(dataArray, "%d", &);
+//            if (auxTimeNow >= auxTimeToSet)USB_send("\nTiempo Seteado\n");
+//            else USB_send("\nTiempo NO Seteado\n");
+//            *counter = 0;
+//            return true;
+//    }
+//}
+
+bool switchThreshold(int* counter, bool* needNewInput, char* dataArray) {
     switch (*counter) {
         case 0:
-            USB_send("\nIngrese el ID del dispositivo, número como maximo 4294967295\n");
+            USB_send("\nIngrese la temperatura umbral nueva\n");
             (*counter)++;
             return false;
         case 1:
@@ -165,17 +191,17 @@ bool switchID(int* counter, bool* needNewInput, char* dataArray) {
                 return false;
             }
         case 2:
-            sscanf(dataArray, "%d", &);
-            if (auxTimeNow >= auxTimeToSet)USB_send("\nTiempo Seteado\n");
-            else USB_send("\nTiempo NO Seteado\n");
+            setThreshold(dataArray
+            USB_send("\nSe cambio Exitosamente la temperatura umbral\n");
             *counter = 0;
             return true;
     }
 }
 
+
 bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, uint32_t p_max, uint32_t p_min) {
     uint32_t intValue;
-    uint32_t i;
+            uint32_t i;
 
     switch (p_type) {
         case UI_OPTION_NUM:
