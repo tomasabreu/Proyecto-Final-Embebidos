@@ -131,15 +131,19 @@ void UI_showMenu(void) {
                 //                    needNewInput1 = false;
                 //                else if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1))
                 //                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 break;
             case( UI_MENU_STATE_PHONE_CHANGE):
+                menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 break;
             case( UI_MENU_STATE_TEMPERATURE_THRESHOLD_CHANGE):
-                if (needNewInput1 && UI_waitForInput(dataArray1))
+                if (needNewInput1 && UI_waitForInput(dataArray1)){
                     needNewInput1 = false;
-                else if (!needNewInput1 && switchThreshold(&counter, &needNewInput1, dataArray1))
+                }
+                if (!needNewInput1 && switchThreshold(&counter, &needNewInput1, atoi(dataArray1))){
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 break;
+                }
         }
     } else {
         menuState = UI_MENU_STATE_INIT_SHOW;
@@ -178,7 +182,7 @@ bool UI_waitForInput(uint8_t *p_dest) {
 //    }
 //}
 
-bool switchThreshold(int* counter, bool* needNewInput, char* dataArray) {
+bool switchThreshold(int* counter, bool* needNewInput, int tempAregistrar) {
     switch (*counter) {
         case 0:
             USB_send("\nIngrese la temperatura umbral nueva\n");
@@ -191,7 +195,7 @@ bool switchThreshold(int* counter, bool* needNewInput, char* dataArray) {
                 return false;
             }
         case 2:
-            setThreshold((int) dataArray);
+            setThreshold(tempAregistrar);
             USB_send("\nSe cambio Exitosamente la temperatura umbral\n");
             *counter = 0;
             return true;

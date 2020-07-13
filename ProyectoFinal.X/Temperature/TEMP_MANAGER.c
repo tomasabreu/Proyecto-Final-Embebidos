@@ -81,6 +81,10 @@ float getTemperature() {
     return temperature;
 }
 
+int getThreshold(){    
+    return thresholdTemperature; 
+}
+
 void averageTemperature() {
     temperature /= 10;
     temperature = round(10 * temperature) / 10;

@@ -153,7 +153,7 @@ void takeTemperature(void *p_param) {
                 while (isSending) {
                     vTaskDelay(pdMS_TO_TICKS(100));
                 }
-                sprintf(usb_writeBuffer, "La temperatura medida es: %.1f\n", getTemperature());
+                sprintf(usb_writeBuffer, "La temperatura medida es: %.1f y la temperatura umbral es: %d\n", getTemperature(), getThreshold());
                 sendUsb(usb_writeBuffer);
                 while (isSending) {
                     vTaskDelay(pdMS_TO_TICKS(100));
@@ -179,7 +179,7 @@ void takeTemperature(void *p_param) {
 void showMenu(void *p_param) {
     for (;;) {
         UI_showMenu();
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(200));
         
     }
 }

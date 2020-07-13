@@ -352,6 +352,8 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d03ffff"/>
+        <property key="programmerToGoFilePath"
+                  value="C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER AÑO/PRIMER SEMESTRE/SISTEMAS OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/debug/default/ProyectoFinal_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.pgmentry.voltage" value="low"/>
