@@ -29,6 +29,7 @@
 #include "../Temperature/TEMP_MANAGER.h"
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -137,12 +138,12 @@ void UI_showMenu(void) {
                 menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 break;
             case( UI_MENU_STATE_TEMPERATURE_THRESHOLD_CHANGE):
-                if (needNewInput1 && UI_waitForInput(dataArray1)){
+                if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && switchThreshold(&counter, &needNewInput1, atoi(dataArray1))){
+                if (!needNewInput1 && switchThreshold(&counter, &needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
-                break;
+                    break;
                 }
         }
     } else {
@@ -182,7 +183,8 @@ bool UI_waitForInput(uint8_t *p_dest) {
 //    }
 //}
 
-bool switchThreshold(int* counter, bool* needNewInput, int tempAregistrar) {
+bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
+    float umbral;
     switch (*counter) {
         case 0:
             USB_send("\nIngrese la temperatura umbral nueva\n");
@@ -195,17 +197,17 @@ bool switchThreshold(int* counter, bool* needNewInput, int tempAregistrar) {
                 return false;
             }
         case 2:
-            setThreshold(tempAregistrar);
+            sscanf(dataArray1, "%f", &umbral);
+            setThreshold(umbral);
             USB_send("\nSe cambio Exitosamente la temperatura umbral\n");
             *counter = 0;
             return true;
     }
 }
 
-
 bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, uint32_t p_max, uint32_t p_min) {
     uint32_t intValue;
-            uint32_t i;
+    uint32_t i;
 
     switch (p_type) {
         case UI_OPTION_NUM:

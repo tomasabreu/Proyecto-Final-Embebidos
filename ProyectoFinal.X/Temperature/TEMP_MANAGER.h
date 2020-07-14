@@ -73,12 +73,13 @@ extern "C" {
      */
 
     void measureTemperature();
-    float getTemperature();
+    double getTemperature();
     void resetTemperature();
     void averageTemperature();
     bool saveTemperature(float temperature);
-    void setThreshold(int temperature);
+    void setThreshold(float temperature);
     bool checkThreshold();
+    float getThreshold();
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }

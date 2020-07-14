@@ -3,17 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/PHONE_MANAGER.c</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/SIM808/SIM808.c</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/main.c</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/framework/LEDs_RGB/LEDs_RGB_fwk.c</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/freeRTOS/tasks.c</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/Temperature/TEMP_MANAGER.h</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/SIM808/SIM808.h</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/UI/UI.h</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/Temperature/TEMP_MANAGER.c</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/PHONE_MANAGER.h</file>
-            <file>file:/C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER%20AÑO/PRIMER%20SEMESTRE/SISTEMAS%20OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/UI/UI.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/freeRTOS/queue.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/UI/UI.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/Temperature/TEMP_MANAGER.c</file>
+            <file>file:/C:/Program%20Files/Microchip/xc32/v2.41/pic32mx/include/lega-c/stdio.h</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/freeRTOS/tasks.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/main.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/mcc_generated_files/exceptions.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/framework/USB/USB_fwk.h</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/SIM808/SIM808.c</file>
+            <file>file:/C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer%20Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/Temperature/TEMP_MANAGER.h</file>
         </group>
     </open-files>
 </project-private>

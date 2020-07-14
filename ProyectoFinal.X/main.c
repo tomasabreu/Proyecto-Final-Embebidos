@@ -64,14 +64,13 @@
 #include "GPS/GPS.h"
 #include "semphr.h"
 #include "SIM808/SIM808.h"
-#include "PHONE_MANAGER.h"
+#include "Phone/PHONE_MANAGER.h"
 
 void takeTemperature(void *p_param);
 void temperatureSwitch(void *p_param);
 void getRealTime(void *p_param);
 void showMenu(void *p_param);
 bool BTN1_pressed = false;
-bool isSending = false;
 
 /*
                          Main application
@@ -81,6 +80,7 @@ int main(void) {
     SYSTEM_Initialize();
     /* Create the tasks defined within this file. */
     //    
+
     xTaskCreate(takeTemperature, "Take temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(temperatureSwitch, "Switch temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(getRealTime, "Get real time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
@@ -114,21 +114,23 @@ void temperatureSwitch(void *p_param) {
 }
 
 void sendUsb(uint8_t* text) {
-    isSending = true;
-    for (;;) {
+    uint8_t i;
+    for (i = 0; i < 10; i++) {
         USB_checkStatus();
         if (USB_getConnectedStatus() && USB_send(text)) {
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(50));
     }
-    isSending = false;
 }
 
 void takeTemperature(void *p_param) {
     // Add your code here
     uint8_t i, counterPressed;
-    uint8_t textToSend[64];
+    char textToSend[80];
+    char textToSend2[64];
+    double temperature2;
+    float threshold;
     for (;;) {
         if (BTN1_pressed) {
             resetTemperature();
@@ -149,26 +151,23 @@ void takeTemperature(void *p_param) {
                 averageTemperature();
                 if (checkThreshold()) {
                     RGB_setAllColor(8, RGB_GREEN);
+                    RGB_showLeds(8);
                 } else {
-                    sendSMS("Tu temperatura esta por arriba del umbral, tenes fiebre.");
                     RGB_setAllColor(8, RGB_RED);
+                    RGB_showLeds(8);
+                    //                    sendSMS("Tu temperatura esta por arriba del umbral, tenes fiebre.");
                 }
-                while (isSending) {
-                    vTaskDelay(pdMS_TO_TICKS(100));
-                }
-                sprintf(usb_writeBuffer, "La temperatura medida es: %.1f y la temperatura umbral es: %d \n", getTemperature(), getThreshold());
-                sendUsb(usb_writeBuffer);
-                while (isSending) {
-                    vTaskDelay(pdMS_TO_TICKS(100));
-                }
-                vTaskDelay(pdMS_TO_TICKS(100));
+                temperature2 = getTemperature();
+                threshold = getThreshold();
+                sprintf(textToSend, "La temperatura medida es: %s y la temperatura umbral es: %s\n", temperature2, threshold);
+                sendUsb(textToSend);
                 if (saveTemperature(getTemperature())) {
-                    strcpy(usb_writeBuffer, "Temperatura guardada correctamente.\n");
+                    strcpy(textToSend2, "Temperatura guardada correctamente.\n");
                 } else {
-                    strcpy(usb_writeBuffer, "No se pudo guardar la temperatura, memoria llena.\n");
+                    strcpy(textToSend2, "No se pudo guardar la temperatura, memoria llena.\n");
                 }
-                sendUsb(usb_writeBuffer);
-                RGB_showLeds(8);
+                sendUsb(textToSend2);
+
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
                 RGB_setAllColor(8, RGB_BLACK);
@@ -183,15 +182,14 @@ void showMenu(void *p_param) {
     for (;;) {
         UI_showMenu();
         vTaskDelay(pdMS_TO_TICKS(200));
-        
     }
 }
-
 
 void getRealTime(void *p_param) {
     time_t timeToShow;
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t nmea[64];
+    static char textToSend[64];
     for (;;) {
         if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
@@ -199,8 +197,8 @@ void getRealTime(void *p_param) {
                     GPS_getUTC(&time, nmea);
                     RTCC_TimeSet(&time);
                     timeToShow = mktime(&time);
-                    sprintf(usb_writeBuffer, "\nEl tiempo es: %s", ctime(&timeToShow));
-                    sendUsb(usb_writeBuffer);
+                    sprintf(textToSend, "\nEl tiempo es: %s", ctime(&timeToShow));
+                    sendUsb(textToSend);
                 }
             }
             xSemaphoreGive(c_semGPSIsReady);
@@ -208,7 +206,6 @@ void getRealTime(void *p_param) {
         vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
-
 
 void vApplicationMallocFailedHook(void) {
     /* vApplicationMallocFailedHook() will only be called if

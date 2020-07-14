@@ -177,7 +177,7 @@ extern "C" {
 
     bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, uint32_t p_max, uint32_t p_min);
     
-    bool switchThreshold(int* counter, bool* needNewInput, int tempAregistrar);
+    bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1);
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

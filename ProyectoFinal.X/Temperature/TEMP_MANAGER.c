@@ -27,7 +27,7 @@
 /* TODO:  Include other files here if needed. */
 #include <stdio.h>
 #include <math.h>
-
+#include <stdbool.h>
 #include "TEMP_MANAGER.h"
 #include "FreeRTOS.h"
 #include "../mcc_generated_files/adc1.h"
@@ -42,7 +42,7 @@
     banner.
  */
 #define amountOfSaveTemperatures 200
-int thresholdTemperature = 37;
+float thresholdTemperature = 37;
 double temperature;
 float savedTemperatures[amountOfSaveTemperatures];
 int lastTemperatureSaved = 0;
@@ -74,20 +74,20 @@ double round(double x) {
 // *****************************************************************************
 
 void measureTemperature() {
-    temperature += (ADC1_GetConversion(TEMP) / 102.3) + 32;
+    temperature += (ADC1_GetConversion(TEMP) / 102.3) + 32.0;
 }
 
-float getTemperature() {
+double getTemperature() {
     return temperature;
 }
 
-int getThreshold(){    
+float getThreshold(){    
     return thresholdTemperature; 
 }
 
 void averageTemperature() {
-    temperature /= 10;
-    temperature = round(10 * temperature) / 10;
+    temperature /= 10.0;
+    temperature = round(10.0 * temperature) / 10.0;
 }
 
 void resetTemperature() {
@@ -103,7 +103,7 @@ bool saveTemperature(float temperature) {
     return false;
 }
 
-void setThreshold(int temperature) {
+void setThreshold(float temperature) {
     thresholdTemperature = temperature;
 }
 
