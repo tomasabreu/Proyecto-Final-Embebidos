@@ -15,8 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _TEMP_MANAGER_H    /* Guard against multiple inclusion */
-#define _TEMP_MANAGER_H
+#ifndef _LOG_MANAGER_H    /* Guard against multiple inclusion */
+#define _LOG_MANAGER_H
 
 
 /* ************************************************************************** */
@@ -25,11 +25,15 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-/* This section lists the other files that are included in this file.
- */
 #include "stdint.h"
 #include "stdbool.h"
+
+/* This section lists the other files that are included in this file.
+ */
+
 /* TODO:  Include other files here if needed. */
+
+
 
 
 /* Provide C++ Compatibility */
@@ -50,7 +54,6 @@ extern "C" {
 
 
 
-
     // *****************************************************************************
     // *****************************************************************************
     // Section: Data Types
@@ -62,6 +65,7 @@ extern "C" {
      */
 
 
+
     // *****************************************************************************
     // *****************************************************************************
     // Section: Interface Functions
@@ -71,14 +75,9 @@ extern "C" {
     /*  A brief description of a section can be given directly below the section
         banner.
      */
+    bool saveLog(uint8_t* sentence);
 
-    void measureTemperature();
-    float getTemperature();
-    void resetTemperature();
-    void averageTemperature();
-    void setThreshold(float temperature);
-    bool checkThreshold();
-    float getThreshold();
+
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }

@@ -24,14 +24,11 @@
 /* This section lists the other files that are included in this file.
  */
 
+#include "LOG_MANAGER.h"
 
 /* TODO:  Include other files here if needed. */
-#include "FreeRTOS.h"
-#include "../SIM808/SIM808.h" 
-#include "PHONE_MANAGER.h"
-#include "string.h"
 
-#include <stdint.h>
+
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: File Scope or Global Data                                         */
@@ -41,7 +38,11 @@
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-uint8_t phoneNumber[9];
+#define amountOfSaveTemperatures 200
+uint8_t* savedTemperatures[amountOfSaveTemperatures];
+int lastTemperatureSaved = 0;
+
+
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -53,37 +54,27 @@ uint8_t phoneNumber[9];
     banner.
  */
 
+/* ************************************************************************** */
+
 
 
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Interface Functions                                               */
 /* ************************************************************************** */
-
 /* ************************************************************************** */
 
-uint8_t* getPhoneNumber() {
-    return phoneNumber;
-}
-
-void setPhoneNumber(uint8_t* phone) {
-    strcpy(phoneNumber, phone);
-}
-
-
-
-void sendSMS(char* text){
-    for(;;){
-        if(c_semGSMIsReady != NULL && xSemaphoreTake(c_semGSMIsReady, portMAX_DELAY) == pdTRUE){
-            SIM808_sendSMS("\"\"",text);
-            xSemaphoreGive(c_semGSMIsReady);
-            break;
-        }
-        vTaskDelay(pdMS_TO_TICKS(50));
+/*  A brief description of a section can be given directly below the section
+    banner.
+ */
+bool saveLog(uint8_t* sentence){
+    lastTemperatureSaved++;
+    if (lastTemperatureSaved < amountOfSaveTemperatures) {
+        savedTemperatures[lastTemperatureSaved] = sentence;
+        return true;
     }
+    return false;
 }
-
-
 
 /* *****************************************************************************
  End of File

@@ -41,11 +41,10 @@
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-#define amountOfSaveTemperatures 200
+
 float thresholdTemperature = 37;
-double temperature;
-float savedTemperatures[amountOfSaveTemperatures];
-int lastTemperatureSaved = 0;
+float temperature = 0;
+
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Local Functions                                                   */
@@ -77,7 +76,7 @@ void measureTemperature() {
     temperature += (ADC1_GetConversion(TEMP) / 102.3) + 32.0;
 }
 
-double getTemperature() {
+float getTemperature() {
     return temperature;
 }
 
@@ -94,14 +93,6 @@ void resetTemperature() {
     temperature = 0;
 }
 
-bool saveTemperature(float temperature) {
-    lastTemperatureSaved++;
-    if (lastTemperatureSaved < amountOfSaveTemperatures) {
-        savedTemperatures[lastTemperatureSaved] = temperature;
-        return true;
-    }
-    return false;
-}
 
 void setThreshold(float temperature) {
     thresholdTemperature = temperature;

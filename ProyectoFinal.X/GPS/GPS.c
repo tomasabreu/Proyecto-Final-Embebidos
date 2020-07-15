@@ -45,8 +45,8 @@ void GPS_getPosition( GPSPosition_t *p_pos, uint8_t *p_sentence ){
     uint8_t *ptr;
 
     offset=GPS_RMC_RUN_LEN+GPS_RMC_COMMA_LEN+GPS_RMC_FIX_LEN+GPS_RMC_COMMA_LEN+GPS_RMC_UTC_LEN+GPS_RMC_COMMA_LEN;
-    p_pos->latitude=strtod( (p_sentence+offset), &ptr );
-    p_pos->longitude=strtod( (ptr+GPS_RMC_COMMA_LEN), &ptr );
+    p_pos->latitude = strtod( (p_sentence+offset), &ptr );
+    p_pos->longitude = strtod( (ptr+GPS_RMC_COMMA_LEN), &ptr );
 }
 
 
@@ -126,9 +126,10 @@ void GPS_generateGoogleMaps( uint8_t *p_linkDest, GPSPosition_t p_gpsData ){
     uint8_t longitude[128];
 
     strcpy( p_linkDest, "http://maps.google.com/?q=" );
-    sprintf( latitude, "%f", p_gpsData.latitude );
+    sprintf( latitude,"%f", p_gpsData.latitude );
     strcat( p_linkDest, latitude );
-    strcat( p_linkDest, "," );
-    sprintf( longitude, "%f", p_gpsData.longitude );
-    strcat( p_linkDest, longitude );
+    strcat( p_linkDest,"," );
+    sprintf( longitude,"%f", p_gpsData.longitude );
+    strcat( p_linkDest,longitude );
+    strcat( p_linkDest,"W" );
 }
