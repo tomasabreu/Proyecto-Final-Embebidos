@@ -126,22 +126,28 @@ void UI_showMenu(void) {
                 } else {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
-                break;
+                break;              
             case( UI_MENU_STATE_CHANGE_ID):
-                //                if (needNewInput1 && UI_waitForInput(dataArray1))
-                //                    needNewInput1 = false;
-                //                else if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1))
-                //                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
-                menuState = UI_MENU_STATE_OPTIONS_SHOW;
-                break;
+                if (needNewInput1 && UI_waitForInput(dataArray1)){
+                    needNewInput1 = false;
+                }    
+                if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1)){
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                    break;
+                }                
             case( UI_MENU_STATE_PHONE_CHANGE):
-                menuState = UI_MENU_STATE_OPTIONS_SHOW;
-                break;
+                if (needNewInput1 && UI_waitForInput(dataArray1)){
+                    needNewInput1 = false;
+                }    
+                if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1)){
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                    break;
+                }   
             case( UI_MENU_STATE_TEMPERATURE_THRESHOLD_CHANGE):
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && switchThreshold(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && switchPhoneNumber(&counter, &needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                     break;
                 }
@@ -163,9 +169,11 @@ bool UI_waitForInput(uint8_t *p_dest) {
 }
 
 bool switchID(int* counter, bool* needNewInput, char* dataArray) {
+    int id;
+    uint8_t array[10];
     switch (*counter) {
         case 0:
-            USB_send("\nIngrese el ID del dispositivo, número como maximo 4294967295\n");
+            USB_send("\nIngrese el ID del dispositivo, debe ser un número de 32 bits entre 0 y 4294967295\n");
             (*counter)++;
             return false;
         case 1:
@@ -175,8 +183,14 @@ bool switchID(int* counter, bool* needNewInput, char* dataArray) {
                 return false;
             }
         case 2:
-            sscanf(dataArray, "%d", &);
-            USB_send("\nSe cambio Exitosamente la temperatura umbral\n");
+            if (UI_checkValidOption(dataArray, UI_OPTION_NUM, 4294967295, 0)) {
+                sscanf(dataArray, "%d", &id);
+                strcpy(array, dataArray);
+                setThreshold(id);
+                USB_send("\nSe cambio exitosamente el ID del dispositivo\n");
+            } else {
+                USB_send("\nPor favor ingrese un valor válido de 32 bits\n");
+            }
             *counter = 0;
             return true;
     }
@@ -197,11 +211,42 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
                 return false;
             }
         case 2:
-            if(UI_checkValidOption(dataArray1,UI_OPTION_NUM,42,32)
-            sscanf(dataArray1, "%f", &umbral);
-            strcpy(array,dataArray1);
-            setThreshold(umbral);
-            USB_send("\nSe cambio Exitosamente la temperatura umbral\n");
+            if (UI_checkValidOption(dataArray1, UI_OPTION_NUM, 42, 32)) {
+                sscanf(dataArray1, "%f", &umbral);
+                strcpy(array, dataArray1);
+                setThreshold(umbral);
+                USB_send("\nSe cambio exitosamente la temperatura umbral\n");
+            } else {
+                USB_send("\nPor favor ingrese un valor válido entre 32 y 42\n");
+            }
+            *counter = 0;
+            return true;
+    }
+}
+
+bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2){
+    int newPhone;
+    uint8_t array[9];
+    switch (*counter) {
+        case 0:
+            USB_send("\nIngrese un nuevo número de teléfono\n");
+            (*counter)++;
+            return false;
+        case 1:
+            if (!(*needNewInput)) {
+                *needNewInput = true;
+                (*counter)++;
+                return false;
+            }
+        case 2:
+            if (UI_checkValidOption(dataArray2, UI_OPTION_NUM, 099999999, 091111111)) {
+                sscanf(dataArray2, "%f", &newPhone);
+                strcpy(array, dataArray2);
+                setThreshold(newPhone);
+                USB_send("\nSe cambió exitosamente el número telefónico\n");
+            } else {
+                USB_send("\nPor favor número válido\n");
+            }
             *counter = 0;
             return true;
     }
