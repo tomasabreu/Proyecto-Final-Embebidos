@@ -185,6 +185,7 @@ bool UI_waitForInput(uint8_t *p_dest) {
 
 bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
     float umbral;
+    uint8_t array[10];
     switch (*counter) {
         case 0:
             USB_send("\nIngrese la temperatura umbral nueva\n");
@@ -198,6 +199,7 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
             }
         case 2:
             sscanf(dataArray1, "%f", &umbral);
+            strcpy(array,dataArray1);
             setThreshold(umbral);
             USB_send("\nSe cambio Exitosamente la temperatura umbral\n");
             *counter = 0;

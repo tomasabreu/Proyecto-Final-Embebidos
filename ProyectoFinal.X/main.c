@@ -134,9 +134,6 @@ void sendUsb(uint8_t* text) {
 void takeTemperature(void *p_param) {
     // Add your code here
     uint8_t i, counterPressed;
-    char textToSend[128];
-    uint8_t temperature2[8];
-    uint8_t threshold2[8];
     for (;;) {
         if (BTN1_pressed) {
             resetTemperature();
@@ -162,14 +159,6 @@ void takeTemperature(void *p_param) {
                 }
                 RGB_showLeds(8);
                 xTaskCreate(sendMessage, "Send Message", 500, NULL, tskIDLE_PRIORITY + 2, &sendSMSHandler);
-                strcpy(textToSend, "La temperatura medida es: ");
-                sprintf(temperature2, "%.1f\n", getTemperature());
-                strcat(textToSend, temperature2);
-                strcat(textToSend, "y la temperatura umbral es:");
-                sprintf(threshold2, "%.1f\n", getThreshold());
-                strcat(textToSend, threshold2);
-                sendUsb(textToSend);
-
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
                 RGB_setAllColor(8, RGB_BLACK);
@@ -221,10 +210,9 @@ void sendMessageFinal(void *p_param) {
 void sendMessage(void *p_param) {
     time_t timeToShow;
     GPSPosition_t gpsPosition = {0, 0};
-    uint8_t googleMapsLink[64];
-    uint8_t nmea[64];
-    uint8_t nmeaWithoutConfig[64];
-    char textToSend2[64];
+    uint8_t googleMapsLink[64],nmea[64],nmeaWithoutConfig[64],textToSend[64];
+    sprintf(textToSend, "La temperatura medida es: %.1f y la temperatura umbral es: %.1f\n", getTemperature(), getThreshold());
+    sendUsb(textToSend);
     for (;;) {
         if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
@@ -233,16 +221,16 @@ void sendMessage(void *p_param) {
                     GPS_getPosition(&gpsPosition, nmeaWithoutConfig);
                     GPS_generateGoogleMaps(googleMapsLink, gpsPosition);
                     sprintf(textToSendFinal, "%d %s %s %.1f\n", 123, ctime(&timeToShow), googleMapsLink, getTemperature());
-                    if (!checkThreshold()){
+                    if (!checkThreshold()) {
                         sendUsb(textToSendFinal);
                         xTaskCreate(sendMessageFinal, "sendMessageFinal", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &sendSMSHandlerFinal);
                     }
                     if (saveLog(textToSendFinal)) {
-                        strcpy(textToSend2, "Temperatura guardada correctamente.\n");
+                        strcpy(textToSend, "Temperatura guardada correctamente.\n");
                     } else {
-                        strcpy(textToSend2, "No se pudo guardar la temperatura, memoria llena.\n");
+                        strcpy(textToSend, "No se pudo guardar la temperatura, memoria llena.\n");
                     }
-                    sendUsb(textToSend2);
+                    sendUsb(textToSend);
                     xSemaphoreGive(c_semGPSIsReady);
                     vTaskDelete(sendSMSHandler);
                 }

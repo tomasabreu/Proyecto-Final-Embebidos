@@ -42,7 +42,7 @@
     banner.
  */
 
-float thresholdTemperature = 37;
+float thresholdTemperature = 37.0;
 float temperature = 0;
 
 /* ************************************************************************** */
