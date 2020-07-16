@@ -162,26 +162,25 @@ bool UI_waitForInput(uint8_t *p_dest) {
     return false;
 }
 
-//bool switchID(int* counter, bool* needNewInput, char* dataArray) {
-//    switch (*counter) {
-//        case 0:
-//            USB_send("\nIngrese el ID del dispositivo, número como maximo 4294967295\n");
-//            (*counter)++;
-//            return false;
-//        case 1:
-//            if (!(*needNewInput)) {
-//                *needNewInput = true;
-//                (*counter)++;
-//                return false;
-//            }
-//        case 2:
-//            sscanf(dataArray, "%d", &);
-//            if (auxTimeNow >= auxTimeToSet)USB_send("\nTiempo Seteado\n");
-//            else USB_send("\nTiempo NO Seteado\n");
-//            *counter = 0;
-//            return true;
-//    }
-//}
+bool switchID(int* counter, bool* needNewInput, char* dataArray) {
+    switch (*counter) {
+        case 0:
+            USB_send("\nIngrese el ID del dispositivo, número como maximo 4294967295\n");
+            (*counter)++;
+            return false;
+        case 1:
+            if (!(*needNewInput)) {
+                *needNewInput = true;
+                (*counter)++;
+                return false;
+            }
+        case 2:
+            sscanf(dataArray, "%d", &);
+            USB_send("\nSe cambio Exitosamente la temperatura umbral\n");
+            *counter = 0;
+            return true;
+    }
+}
 
 bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
     float umbral;
@@ -198,6 +197,7 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
                 return false;
             }
         case 2:
+            if(UI_checkValidOption(dataArray1,UI_OPTION_NUM,42,32)
             sscanf(dataArray1, "%f", &umbral);
             strcpy(array,dataArray1);
             setThreshold(umbral);
@@ -207,8 +207,8 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
     }
 }
 
-bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, uint32_t p_max, uint32_t p_min) {
-    uint32_t intValue;
+bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, float p_max, float p_min) {
+    float intValue;
     uint32_t i;
 
     switch (p_type) {

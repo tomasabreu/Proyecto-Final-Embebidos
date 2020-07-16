@@ -50,6 +50,7 @@
       <itemPath>UI/UI.h</itemPath>
       <itemPath>Phone/PHONE_MANAGER.h</itemPath>
       <itemPath>LOG_MANAGER.h</itemPath>
+      <itemPath>DATA_MANAGER.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -98,6 +99,7 @@
       <itemPath>UI/UI.c</itemPath>
       <itemPath>Phone/PHONE_MANAGER.c</itemPath>
       <itemPath>LOG_MANAGER.c</itemPath>
+      <itemPath>DATA_MANAGER.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
