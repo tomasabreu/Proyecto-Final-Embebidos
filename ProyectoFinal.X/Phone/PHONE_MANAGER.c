@@ -75,7 +75,7 @@ void setPhoneNumber(uint8_t* phone) {
 void sendSMS(char* text){
     for(;;){
         if(c_semGSMIsReady != NULL && xSemaphoreTake(c_semGSMIsReady, portMAX_DELAY) == pdTRUE){
-            SIM808_sendSMS("\"\"",text);
+            SIM808_sendSMS("\"091969979\"",text);
             xSemaphoreGive(c_semGSMIsReady);
             break;
         }
