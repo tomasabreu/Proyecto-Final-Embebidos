@@ -24,14 +24,10 @@
 /* This section lists the other files that are included in this file.
  */
 
-
 /* TODO:  Include other files here if needed. */
-#include "FreeRTOS.h"
-#include "../SIM808/SIM808.h" 
-#include "PHONE_MANAGER.h"
-#include "string.h"
+#include "DATA_MANAGER.h"
 
-#include <stdint.h>
+
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: File Scope or Global Data                                         */
@@ -41,7 +37,10 @@
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-uint8_t phoneNumber[9];
+
+static uint32_t phoneNumber = 91969979;
+static uint32_t id = 1234;
+static enum rgb_colors ledColor[3] = {RGB_BLUE, RGB_GREEN, RGB_RED};
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -53,35 +52,59 @@ uint8_t phoneNumber[9];
     banner.
  */
 
+/* ************************************************************************** */
 
+void setID(uint32_t newId) {
+    id = newId;
+}
 
+uint32_t getID() {
+    return id;
+}
+
+void setPhone(uint32_t phone) {
+    phoneNumber = phone;
+}
+
+uint32_t getPhone() {
+    return phoneNumber;
+}
+
+void setLedColor(uint8_t* ledColors) {
+    int i;
+    for (i = 0; i < 3; i++){
+        switch (ledColors[i]) {
+            case 0:
+                ledColor[i] = rgb_colors.RGB_WHITE;
+                break;
+            case 1:
+                ledColor[i] = rgb_colors.RGB_BLUE;
+                break;
+            case 2:
+                ledColor[i] = rgb_colors.RGB_GREEN;
+                break;
+            case 3:
+                ledColor[i] = rgb_colors.RGB_RED;
+                break;
+        }
+    }
+}
+
+enum rgb_colors* getLedColor(){
+    return ledColor;
+}
+ 
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Interface Functions                                               */
 /* ************************************************************************** */
-
 /* ************************************************************************** */
 
-uint8_t* getPhoneNumber() {
-    return phoneNumber;
-}
+/*  A brief description of a section can be given directly below the section
+    banner.
+ */
 
-void setPhoneNumber(uint8_t* phone) {
-    strcpy(phoneNumber, phone);
-}
-
-
-
-void sendSMS(char* text){
-    for(;;){
-        if(c_semGSMIsReady != NULL && xSemaphoreTake(c_semGSMIsReady, portMAX_DELAY) == pdTRUE){
-            SIM808_sendSMS("\"091969979\"",text);
-            xSemaphoreGive(c_semGSMIsReady);
-            break;
-        }
-        vTaskDelay(pdMS_TO_TICKS(50));
-    }
-}
+// *****************************************************************************
 
 
 

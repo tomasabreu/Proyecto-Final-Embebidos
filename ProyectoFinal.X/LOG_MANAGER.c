@@ -39,8 +39,8 @@
     banner.
  */
 #define amountOfSaveTemperatures 200
-uint8_t* savedTemperatures[amountOfSaveTemperatures];
-int lastTemperatureSaved = 0;
+static uint8_t* savedTemperatures[amountOfSaveTemperatures];
+static int lastTemperatureSaved = 0;
 
 
 

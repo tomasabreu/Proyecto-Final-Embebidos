@@ -15,8 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _PHONE_MANAGER_H    /* Guard against multiple inclusion */
-#define _PHONE_MANAGER_H
+#ifndef _DATA_MANAGER_H    /* Guard against multiple inclusion */
+#define _DATA_MANAGER_H
 
 
 /* ************************************************************************** */
@@ -29,13 +29,16 @@
  */
 
 /* TODO:  Include other files here if needed. */
+#include <stdbool.h>
+#include <stdint.h>
+#include "../platform/WS2812.h"
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    
+
     /* ************************************************************************** */
     /* ************************************************************************** */
     /* Section: Constants                                                         */
@@ -45,8 +48,6 @@ extern "C" {
     /*  A brief description of a section can be given directly below the section
         banner.
      */
-
-
 
 
     // *****************************************************************************
@@ -61,6 +62,9 @@ extern "C" {
 
 
     // *****************************************************************************
+
+
+    // *****************************************************************************
     // *****************************************************************************
     // Section: Interface Functions
     // *****************************************************************************
@@ -69,10 +73,13 @@ extern "C" {
     /*  A brief description of a section can be given directly below the section
         banner.
      */
-//    uint8_t* getPhoneNumber();
-//    void setPhoneNumber(uint8_t* phone);
-//    void sendSMS(char* text);
 
+    void setID(uint32_t id);
+    uint32_t getID();
+    void setPhone(uint32_t phone);
+    uint32_t getPhone();
+    void setLedColor(uint8_t ledColor);
+    enum rgb_colors* getLedColor();
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

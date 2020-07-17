@@ -114,7 +114,8 @@ extern "C" {
         UI_MENU_STATE_OPTIONS_CHECK,
         UI_MENU_STATE_CHANGE_ID,
         UI_MENU_STATE_TEMPERATURE_THRESHOLD_CHANGE,
-        UI_MENU_STATE_PHONE_CHANGE,              
+        UI_MENU_STATE_PHONE_CHANGE,
+        UI_MENU_STATE_LED_COLOR_CHANGE,
     } ui_menu_states_t;
 
     // *****************************************************************************
@@ -175,9 +176,15 @@ extern "C" {
 
     bool UI_waitForInput(uint8_t *p_dest);
 
-    bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, uint32_t p_max, uint32_t p_min);
+    bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, double p_max, double p_min);
     
-    bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1);
+    bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray);
+    
+    bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray);
+    
+    bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray);
+    
+    bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray)
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

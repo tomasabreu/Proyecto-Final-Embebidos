@@ -27,6 +27,7 @@
 #include "UI.h"
 #include "../../framework/USB/USB_fwk.h"
 #include "../Temperature/TEMP_MANAGER.h"
+#include "../DataManager/DATA_MANAGER.h"
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -126,24 +127,24 @@ void UI_showMenu(void) {
                 } else {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
-                break;              
+                break;
             case( UI_MENU_STATE_CHANGE_ID):
-                if (needNewInput1 && UI_waitForInput(dataArray1)){
+                if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
-                }    
-                if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1)){
+                }
+                if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                     break;
-                }                
-            case( UI_MENU_STATE_PHONE_CHANGE):
-                if (needNewInput1 && UI_waitForInput(dataArray1)){
-                    needNewInput1 = false;
-                }    
-                if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1)){
-                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
-                    break;
-                }   
+                }
             case( UI_MENU_STATE_TEMPERATURE_THRESHOLD_CHANGE):
+                if (needNewInput1 && UI_waitForInput(dataArray1)) {
+                    needNewInput1 = false;
+                }
+                if (!needNewInput1 && switchThreshold(&counter, &needNewInput1, dataArray1)) {
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                    break;
+                }
+            case( UI_MENU_STATE_PHONE_CHANGE):
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
@@ -151,6 +152,15 @@ void UI_showMenu(void) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                     break;
                 }
+            case( UI_MENU_STATE_LED_COLOR_CHANGE):
+                if (needNewInput1 && UI_waitForInput(dataArray1)) {
+                    needNewInput1 = false;
+                }
+                if (!needNewInput1 && switchPhoneNumber(&counter, &needNewInput1, dataArray1)) {
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                    break;
+                }
+
         }
     } else {
         menuState = UI_MENU_STATE_INIT_SHOW;
@@ -168,9 +178,8 @@ bool UI_waitForInput(uint8_t *p_dest) {
     return false;
 }
 
-bool switchID(int* counter, bool* needNewInput, char* dataArray) {
-    int id;
-    uint8_t array[10];
+bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray) {
+    uint32_t id;
     switch (*counter) {
         case 0:
             USB_send("\nIngrese el ID del dispositivo, debe ser un número de 32 bits entre 0 y 4294967295\n");
@@ -184,9 +193,8 @@ bool switchID(int* counter, bool* needNewInput, char* dataArray) {
             }
         case 2:
             if (UI_checkValidOption(dataArray, UI_OPTION_NUM, 4294967295, 0)) {
-                sscanf(dataArray, "%d", &id);
-                strcpy(array, dataArray);
-                setThreshold(id);
+                sscanf(dataArray, "%u", &id);
+                setID(id);
                 USB_send("\nSe cambio exitosamente el ID del dispositivo\n");
             } else {
                 USB_send("\nPor favor ingrese un valor válido de 32 bits\n");
@@ -224,9 +232,8 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
     }
 }
 
-bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2){
-    int newPhone;
-    uint8_t array[9];
+bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
+    uint32_t newPhone;
     switch (*counter) {
         case 0:
             USB_send("\nIngrese un nuevo número de teléfono\n");
@@ -239,10 +246,9 @@ bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2){
                 return false;
             }
         case 2:
-            if (UI_checkValidOption(dataArray2, UI_OPTION_NUM, 099999999, 091111111)) {
-                sscanf(dataArray2, "%f", &newPhone);
-                strcpy(array, dataArray2);
-                setThreshold(newPhone);
+            if (UI_checkValidOption(dataArray2, UI_OPTION_NUM, 99999999, 91000000)) {
+                sscanf(dataArray2, "%u", &newPhone);
+                setPhone(newPhone);
                 USB_send("\nSe cambió exitosamente el número telefónico\n");
             } else {
                 USB_send("\nPor favor número válido\n");
@@ -252,8 +258,36 @@ bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2){
     }
 }
 
-bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, float p_max, float p_min) {
-    float intValue;
+bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray2) {
+    uint8_t newColor1;
+    uint8_t newColor2;
+    uint8_t newColor3;
+    
+    switch (*counter) {
+        case 0:
+            USB_send("\nIngrese un nuevo número de teléfono\n");
+            (*counter)++;
+            return false;
+        case 1:
+            if (!(*needNewInput)) {
+                *needNewInput = true;
+                (*counter)++;
+                return false;
+            }
+        case 2:
+            if (UI_checkValidOption(dataArray2, UI_OPTION_NUM, 3, 0)) {
+                sscanf(dataArray2, "%u,%u,%u", &newColor1, &newColor2, &newColor3);
+                USB_send("\nSe cambió exitosamente el número telefónico\n");
+            } else {
+                USB_send("\nPor favor número válido\n");
+            }
+            *counter = 0;
+            return true;
+    }
+}
+
+bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, double p_max, double p_min) {
+    double intValue;
     uint32_t i;
 
     switch (p_type) {
@@ -263,7 +297,7 @@ bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, float p_max, float
                     return false;
                 }
             }
-            intValue = atoi(p_src);
+            intValue = atof(p_src);
             if ((intValue < p_min) || (intValue > p_max)) {
                 return false;
             }

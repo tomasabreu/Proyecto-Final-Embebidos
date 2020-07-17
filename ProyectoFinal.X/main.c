@@ -64,8 +64,10 @@
 #include "GPS/GPS.h"
 #include "semphr.h"
 #include "SIM808/SIM808.h"
-#include "Phone/PHONE_MANAGER.h"
+#include "DataManager/DATA_MANAGER.h"
 #include "LOG_MANAGER.h"
+#include "mcc_generated_files/rtcc.h"
+#include <stdlib.h>
 
 void takeTemperature(void *p_param);
 void temperatureSwitch(void *p_param);
@@ -75,8 +77,8 @@ void sendMessage(void *p_param);
 void sendMessageFinal(void *p_param);
 bool BTN1_pressed = false;
 char textToSendFinal[128];
-TaskHandle_t sendSMSHandler;
-TaskHandle_t sendSMSHandlerFinal;
+TaskHandle_t sendSMSHandler = NULL;
+TaskHandle_t sendSMSHandlerFinal = NULL;
 
 /*
                          Main application
@@ -121,7 +123,7 @@ void temperatureSwitch(void *p_param) {
 }
 
 void sendUsb(uint8_t* text) {
-    uint8_t i;
+    static uint8_t i;
     for (i = 0; i < 10 ; i++) {
         USB_checkStatus();
         if (USB_getConnectedStatus() && USB_send(text)) {
@@ -134,7 +136,7 @@ void sendUsb(uint8_t* text) {
 
 void takeTemperature(void *p_param) {
     // Add your code here
-    uint8_t i, counterPressed;
+    static uint8_t counterPressed;
     for (;;) {
         if (BTN1_pressed) {
             resetTemperature();
@@ -143,7 +145,7 @@ void takeTemperature(void *p_param) {
                     break;
                 }
                 if (counterPressed % 2 == 0) {
-                    RGB_setAllColor(8, RGB_BLUE);
+                    RGB_setAllColor(8, getLedColor()[0]);
                 } else {
                     RGB_setAllColor(8, RGB_BLACK);
                 }
@@ -154,12 +156,12 @@ void takeTemperature(void *p_param) {
             if (counterPressed == 10) {
                 averageTemperature();
                 if (checkThreshold()) {
-                    RGB_setAllColor(8, RGB_GREEN);
+                    RGB_setAllColor(8, getLedColor()[1]);
                 } else {
-                    RGB_setAllColor(8, RGB_RED);
+                    RGB_setAllColor(8, getLedColor()[2]);
                 }
                 RGB_showLeds(8);
-                xTaskCreate(sendMessage, "Send Message", 500, NULL, tskIDLE_PRIORITY + 2, &sendSMSHandler);
+                xTaskCreate(sendMessage, "Send Message",512 , NULL, tskIDLE_PRIORITY + 2, &sendSMSHandler);
                 BTN1_pressed = false;
                 vTaskDelay(pdMS_TO_TICKS(2000));
                 RGB_setAllColor(8, RGB_BLACK);
@@ -178,12 +180,11 @@ void showMenu(void *p_param) {
 }
 
 void getRealTime(void *p_param) {
-    time_t timeToShow;
+    static time_t timeToShow;
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    uint8_t nmea[64];
-    uint8_t nmeaWithoutConfig[64];
-    char textToSend[64];
-    bool isValid;
+    static uint8_t nmea[64], nmeaWithoutConfig[64];
+    static char textToSend[64];
+    static bool isValid;
     for (;;) {
         isValid = false;
         if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE ) {
@@ -208,36 +209,48 @@ void getRealTime(void *p_param) {
     }
 }
 
-void sendMessageFinal(void *p_param) {
-    sendSMS(textToSendFinal);
+void sendSMSFinal(void *p_param) {
+    static uint8_t array[12];
+    static int i;
+    sprintf(array,("\"0%u\""), getPhone());
+    for(i = 0; i < 10; i++){
+        if(c_semGSMIsReady != NULL && xSemaphoreTake(c_semGSMIsReady, portMAX_DELAY) == pdTRUE){
+            SIM808_sendSMS(array,textToSendFinal);
+            xSemaphoreGive(c_semGSMIsReady);
+            break;
+        }
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
     vTaskDelete(sendSMSHandlerFinal);
 }
 
 void sendMessage(void *p_param) {
-    time_t timeToShow;
-    GPSPosition_t gpsPosition = {0, 0};
-    uint8_t googleMapsLink[64],nmea[64],nmeaWithoutConfig[64],textToSend[64];
+    static time_t timeToShow;
+    static struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    static int i;
+    static GPSPosition_t gpsPosition = {0, 0};
+    static uint8_t googleMapsLink[64],nmea[64],nmeaWithoutConfig[64],textToSend[64];
     sprintf(textToSend, "La temperatura medida es: %.1f y la temperatura umbral es: %.1f\n", getTemperature(), getThreshold());
-    sendUsb(textToSend);
-    for (;;) {
+    sendUsb(textToSend);  
+    for (i = 0; i < 10; i++) {
         if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
                 if (SIM808_validateNMEAFrame(nmea)) {
                     strncpy(nmeaWithoutConfig, (nmea + 12), strlen(nmea));
                     GPS_getPosition(&gpsPosition, nmeaWithoutConfig);
                     GPS_generateGoogleMaps(googleMapsLink, gpsPosition);
-                    sprintf(textToSendFinal, "%d %s %s %.1f\n", 123, ctime(&timeToShow), googleMapsLink, getTemperature());
+                    RTCC_TimeGet(&time);
+                    timeToShow = mktime(&time);
+                    sprintf(textToSendFinal, "%d %s %s %.1f\n", getID(), ctime(&timeToShow), googleMapsLink, getTemperature());
                     if (!checkThreshold()) {
                         sendUsb(textToSendFinal);
-                        //xTaskCreate(sendMessageFinal, "sendMessageFinal", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &sendSMSHandlerFinal);
+                        //xTaskCreate(sendSMSFinal, "sendSMSFinal", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &sendSMSHandlerFinal);
                     }
-                    memset(textToSend, 0, strlen(textToSend));
                     if (saveLog(textToSendFinal)) {
-                        strcpy(textToSend, "Temperatura guardada correctamente.\n");
+                        sendUsb("Temperatura guardada correctamente.\n");
                     } else {
-                        strcpy(textToSend, "No se pudo guardar la temperatura, memoria llena.\n");
+                        sendUsb("No se pudo guardar la temperatura, memoria llena.\n");
                     }
-                    sendUsb(textToSend);
                     xSemaphoreGive(c_semGPSIsReady);
                     vTaskDelete(sendSMSHandler);
                 }
@@ -246,6 +259,8 @@ void sendMessage(void *p_param) {
         }
         vTaskDelay(pdMS_TO_TICKS(100));
     }
+    sendUsb("No hay acceso a la informacion necesaria, Intentelo nuevamente \n");
+    vTaskDelete(sendSMSHandler);
 }
 
 void vApplicationMallocFailedHook(void) {
