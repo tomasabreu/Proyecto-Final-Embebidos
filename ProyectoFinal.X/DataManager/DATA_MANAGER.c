@@ -75,16 +75,16 @@ void setLedColor(uint8_t* ledColors) {
     for (i = 0; i < 3; i++){
         switch (ledColors[i]) {
             case 0:
-                ledColor[i] = rgb_colors.RGB_WHITE;
+                ledColor[i] = RGB_WHITE;
                 break;
             case 1:
-                ledColor[i] = rgb_colors.RGB_BLUE;
+                ledColor[i] = RGB_BLUE;
                 break;
             case 2:
-                ledColor[i] = rgb_colors.RGB_GREEN;
+                ledColor[i] = RGB_GREEN;
                 break;
             case 3:
-                ledColor[i] = rgb_colors.RGB_RED;
+                ledColor[i] = RGB_RED;
                 break;
         }
     }

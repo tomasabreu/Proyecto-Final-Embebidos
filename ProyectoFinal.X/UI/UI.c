@@ -259,9 +259,7 @@ bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
 }
 
 bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray2) {
-    uint8_t newColor1;
-    uint8_t newColor2;
-    uint8_t newColor3;
+    uint8_t newColor[3];
     
     switch (*counter) {
         case 0:
@@ -276,8 +274,9 @@ bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray2) {
             }
         case 2:
             if (UI_checkValidOption(dataArray2, UI_OPTION_NUM, 3, 0)) {
-                sscanf(dataArray2, "%u,%u,%u", &newColor1, &newColor2, &newColor3);
+                sscanf(dataArray2, "%u,%u,%u", &newColor[0], &newColor[1], &newColor[2]);
                 USB_send("\nSe cambió exitosamente el número telefónico\n");
+                setLedColor(&newColor);
             } else {
                 USB_send("\nPor favor número válido\n");
             }
