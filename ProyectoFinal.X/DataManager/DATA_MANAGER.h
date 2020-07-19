@@ -78,7 +78,7 @@ extern "C" {
     uint32_t getID();
     void setPhone(uint32_t phone);
     uint32_t getPhone();
-    void setLedColor(uint8_t ledColor);
+    void setLedColor(uint8_t ledColor1, uint8_t ledColor2, uint8_t ledColor3);
     enum rgb_colors* getLedColor();
 
     /* Provide C++ Compatibility */

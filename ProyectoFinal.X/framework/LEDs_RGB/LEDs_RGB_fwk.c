@@ -135,7 +135,7 @@ static ws2812_t ledsMatrix[LED_RGB_SIZE];
   @Remarks
     Refer to the example_file.h interface header for function usage details.
  */
-void RGB_setLedColor( uint8_t p_index, enum rgb_colors p_color ){
+void RGB_setLedColor( uint8_t p_index,enum rgb_colors p_color ){
     switch(p_color){
         case RGB_WHITE:
             ledsMatrix[p_index]=WHITE;
@@ -155,7 +155,7 @@ void RGB_setLedColor( uint8_t p_index, enum rgb_colors p_color ){
     }
 }
 
-void RGB_setAllColor(int num_Led,enum rgb_colors p_color){
+void RGB_setAllColor(int num_Led, enum rgb_colors p_color){
     int i;
     for(i = 0; i < num_Led; i++){RGB_setLedColor(i, p_color);}
 }

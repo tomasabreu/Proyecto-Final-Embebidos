@@ -184,7 +184,7 @@ extern "C" {
     
     bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray);
     
-    bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray)
+    bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray);
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

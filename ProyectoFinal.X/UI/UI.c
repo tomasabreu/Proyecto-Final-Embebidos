@@ -60,7 +60,7 @@
     Any additional remarks
  */
 const uint8_t ui_welcomeText[] = "Bienvenido al Proyecto de Sistemas Embebidos\nPor favor presione una tecla para continuar...\n";
-const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Cambiar el ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono al que se le manda el mensaje\n";
+const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Cambiar el ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono al que se le manda el mensaje\n4)Cambiar los colores de las medidas de temperatura\n";
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -122,7 +122,7 @@ void UI_showMenu(void) {
                 }
                 break;
             case( UI_MENU_STATE_OPTIONS_CHECK):
-                if ((UI_checkValidOption(dataArray1, UI_OPTION_NUM, 3, 1))) {
+                if ((UI_checkValidOption(dataArray1, UI_OPTION_NUM, 4, 1))) {
                     menuState = UI_MENU_STATE_OPTIONS_CHECK + atoi(dataArray1);
                 } else {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
@@ -156,7 +156,7 @@ void UI_showMenu(void) {
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && switchPhoneNumber(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && switchChangeLedColor(&counter, &needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                     break;
                 }
@@ -258,12 +258,24 @@ bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
     }
 }
 
-bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray2) {
-    uint8_t newColor[3];
+/*
+ "\n En esta seccion se podra cambiar el color de tomada de temperatura y los colores de cuando la persona tiene fiebre y cuando esta asalvo.\n "
+                    "El formato sera \"color mientras se mide la temperatura, color de termperatura mayor a umbral, color de temperatura menor a umbral\" \n "
+                    "A su vez en cada uno de estos podras elegir entre 4 colores, siendo blanco=0, rojo=1, verde=2, azul=3 \n "
+                    "Un ejemplo de envio seria \"1,2,3\" lo cual estarias colocando en rojo la temperatura mientras mide, en verde mayor a umbral y azul menor a umbral. \n"
+ 
+ */
+
+
+bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) {
+    uint8_t* newColor1;
+    uint8_t* newColor2;
+    uint8_t* newColor3;
     
+
     switch (*counter) {
         case 0:
-            USB_send("\nIngrese un nuevo número de teléfono\n");
+            USB_send("\n Ingrese numeros del 0 al 3 siendo 0 color blanco 1 color rojo 2 color verde y 3 color azul. \n El formato es \"1,2,3\" el primer numero tiene el color mientras se mide la temperatura, el segundo menor a umbral y tercero mayor a umbral.\n");
             (*counter)++;
             return false;
         case 1:
@@ -273,13 +285,12 @@ bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray2) {
                 return false;
             }
         case 2:
-            if (UI_checkValidOption(dataArray2, UI_OPTION_NUM, 3, 0)) {
-                sscanf(dataArray2, "%u,%u,%u", &newColor[0], &newColor[1], &newColor[2]);
-                USB_send("\nSe cambió exitosamente el número telefónico\n");
-                setLedColor(&newColor);
-            } else {
-                USB_send("\nPor favor número válido\n");
-            }
+            sscanf(dataArray, "%u,%u,%u", &newColor1, &newColor2, &newColor3);
+            USB_send("\nSe cambió exitosamente los colores\n");
+            setLedColor(newColor1,newColor2,newColor3);
+            //            } else {
+            //                USB_send("\nPor favor ingrese el numero del color correspondiente siendo estos 0,1,2,3\n");
+            //            }
             *counter = 0;
             return true;
     }

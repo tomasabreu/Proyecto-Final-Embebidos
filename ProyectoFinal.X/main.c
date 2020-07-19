@@ -145,7 +145,7 @@ void takeTemperature(void *p_param) {
                     break;
                 }
                 if (counterPressed % 2 == 0) {
-                    RGB_setAllColor(8, getLedColor()[0]);
+                    RGB_setAllColor(8, (getLedColor()[0]));
                 } else {
                     RGB_setAllColor(8, RGB_BLACK);
                 }
@@ -156,9 +156,9 @@ void takeTemperature(void *p_param) {
             if (counterPressed == 10) {
                 averageTemperature();
                 if (checkThreshold()) {
-                    RGB_setAllColor(8, getLedColor()[1]);
+                    RGB_setAllColor(8, (getLedColor()[1]));
                 } else {
-                    RGB_setAllColor(8, getLedColor()[2]);
+                    RGB_setAllColor(8, (getLedColor()[2]));
                 }
                 RGB_showLeds(8);
                 xTaskCreate(sendMessage, "Send Message",512 , NULL, tskIDLE_PRIORITY + 2, &sendSMSHandler);

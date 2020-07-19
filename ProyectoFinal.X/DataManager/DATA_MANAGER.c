@@ -26,6 +26,7 @@
 
 /* TODO:  Include other files here if needed. */
 #include "DATA_MANAGER.h"
+#include "../framework/LEDs_RGB/LEDs_RGB_fwk.h"
 
 
 /* ************************************************************************** */
@@ -70,24 +71,49 @@ uint32_t getPhone() {
     return phoneNumber;
 }
 
-void setLedColor(uint8_t* ledColors) {
-    int i;
-    for (i = 0; i < 3; i++){
-        switch (ledColors[i]) {
+void setLedColor(uint8_t ledColor1, uint8_t ledColor2, uint8_t ledColor3) {
+        switch (ledColor1) {
             case 0:
-                ledColor[i] = RGB_WHITE;
+                ledColor[0] = RGB_WHITE;
                 break;
             case 1:
-                ledColor[i] = RGB_BLUE;
+                ledColor[0] = RGB_RED;
                 break;
             case 2:
-                ledColor[i] = RGB_GREEN;
+                ledColor[0] = RGB_GREEN;
                 break;
             case 3:
-                ledColor[i] = RGB_RED;
+                ledColor[0] = RGB_BLUE;
                 break;
         }
-    }
+        switch (ledColor2) {
+            case 0:
+                ledColor[1] = RGB_WHITE;
+                break;
+            case 1:
+                ledColor[1] = RGB_RED;
+                break;
+            case 2:
+                ledColor[1] = RGB_GREEN;
+                break;
+            case 3:
+                ledColor[1] = RGB_BLUE;
+                break;
+        }
+        switch (ledColor3) {
+            case 0:
+                ledColor[2] = RGB_WHITE;
+                break;
+            case 1:
+                ledColor[2] = RGB_RED;
+                break;
+            case 2:
+                ledColor[2] = RGB_GREEN;
+                break;
+            case 3:
+                ledColor[2] = RGB_BLUE;
+                break;
+        }
 }
 
 enum rgb_colors* getLedColor(){
