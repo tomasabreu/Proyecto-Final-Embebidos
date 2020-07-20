@@ -89,7 +89,7 @@ int main(void) {
     /* Create the tasks defined within this file. */
     //    
 
-    xTaskCreate(takeTemperature, "Take temperature", 500, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(takeTemperature, "Take temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(temperatureSwitch, "Switch temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(getRealTime, "Get real time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
     xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
@@ -175,7 +175,7 @@ void takeTemperature(void *p_param) {
 void showMenu(void *p_param) {
     for (;;) {
         UI_showMenu();
-        vTaskDelay(pdMS_TO_TICKS(200));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -232,8 +232,9 @@ void sendMessage(void *p_param) {
     static uint8_t googleMapsLink[64],nmea[64],nmeaWithoutConfig[64],textToSend[64];
     sprintf(textToSend, "La temperatura medida es: %.1f y la temperatura umbral es: %.1f\n", getTemperature(), getThreshold());
     sendUsb(textToSend);  
+    vTaskDelete(sendSMSHandler);
     for (i = 0; i < 10; i++) {
-        if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE) {
+        if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, pdMS_TO_TICKS(100)) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
                 if (SIM808_validateNMEAFrame(nmea)) {
                     strncpy(nmeaWithoutConfig, (nmea + 12), strlen(nmea));
@@ -257,9 +258,8 @@ void sendMessage(void *p_param) {
             }
             xSemaphoreGive(c_semGPSIsReady);
         }
-        vTaskDelay(pdMS_TO_TICKS(100));
     }
-    sendUsb("No hay acceso a la informacion necesaria, Intentelo nuevamente \n");
+    sendUsb("No hay acceso a la informacion necesaria, Intentelo nuevamente\n");
     vTaskDelete(sendSMSHandler);
 }
 

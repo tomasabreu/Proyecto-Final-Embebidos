@@ -60,7 +60,7 @@
     Any additional remarks
  */
 const uint8_t ui_welcomeText[] = "Bienvenido al Proyecto de Sistemas Embebidos\nPor favor presione una tecla para continuar...\n";
-const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Cambiar el ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono al que se le manda el mensaje\n4)Cambiar los colores de las medidas de temperatura\n";
+const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Cambiar el ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono al que se le manda el mensaje\n4) Cambiar los colores de las medidas de temperatura\n";
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -268,14 +268,14 @@ bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
 
 
 bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) {
-    uint8_t* newColor1;
-    uint8_t* newColor2;
-    uint8_t* newColor3;
-    
+
+    int firstColor;
+    int secondColor;
+    int thirdColor;
 
     switch (*counter) {
         case 0:
-            USB_send("\n Ingrese numeros del 0 al 3 siendo 0 color blanco 1 color rojo 2 color verde y 3 color azul. \n El formato es \"1,2,3\" el primer numero tiene el color mientras se mide la temperatura, el segundo menor a umbral y tercero mayor a umbral.\n");
+            USB_send("\nIngrese numeros del 0 al 3.\n0 = Blanco\n1 = Rojo\n2 = Verde\n3 = Azul\nEl formato es \"1,2,3\"\nEl primer numero es el color parpadiante al medir la temperatura\nEl segundo se presenta cuando la temperatura es menor al umbral\nY tercero cuando es mayor.\n");
             (*counter)++;
             return false;
         case 1:
@@ -285,12 +285,15 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
                 return false;
             }
         case 2:
-            sscanf(dataArray, "%u,%u,%u", &newColor1, &newColor2, &newColor3);
-            USB_send("\nSe cambió exitosamente los colores\n");
-            setLedColor(newColor1,newColor2,newColor3);
-            //            } else {
-            //                USB_send("\nPor favor ingrese el numero del color correspondiente siendo estos 0,1,2,3\n");
-            //            }
+
+            sscanf(dataArray, "%d,%d,%d", &firstColor, &secondColor, &thirdColor);
+            if (firstColor >= 0 && firstColor < 4 && secondColor >= 0 && secondColor < 4 && thirdColor >= 0 && thirdColor < 4) {
+                uint8_t arrayColors[3] = {firstColor, secondColor, thirdColor};
+                USB_send("\nSe cambió exitosamente los colores\n");
+                setLedColor(arrayColors);
+            } else {
+                USB_send("\nLos datos ingresados no respetan el formato, por favor ingrese los numeros de los colors correspondientes siendo estos 0,1,2,3\n");
+            }
             *counter = 0;
             return true;
     }
