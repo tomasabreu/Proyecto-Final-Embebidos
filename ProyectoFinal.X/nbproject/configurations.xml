@@ -18,6 +18,10 @@
       <logicalFolder name="MCC Generated Files"
                      displayName="MCC Generated Files"
                      projectFiles="true">
+        <logicalFolder name="memory" displayName="memory" projectFiles="true">
+          <itemPath>mcc_generated_files/memory/flash_demo.h</itemPath>
+          <itemPath>mcc_generated_files/memory/flash.h</itemPath>
+        </logicalFolder>
         <logicalFolder name="usb" displayName="usb" projectFiles="true">
           <itemPath>mcc_generated_files/usb/usb_hal_pic32mm.h</itemPath>
           <itemPath>mcc_generated_files/usb/usb_ch9.h</itemPath>
@@ -72,6 +76,10 @@
       <logicalFolder name="MCC Generated Files"
                      displayName="MCC Generated Files"
                      projectFiles="true">
+        <logicalFolder name="memory" displayName="memory" projectFiles="true">
+          <itemPath>mcc_generated_files/memory/flash.c</itemPath>
+          <itemPath>mcc_generated_files/memory/flash_demo.c</itemPath>
+        </logicalFolder>
         <logicalFolder name="usb" displayName="usb" projectFiles="true">
           <itemPath>mcc_generated_files/usb/usb_device_events.c</itemPath>
           <itemPath>mcc_generated_files/usb/usb_device.c</itemPath>
@@ -225,7 +233,7 @@
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
-        <property key="heap-size" value="3000"/>
+        <property key="heap-size" value="512"/>
         <property key="input-libraries" value=""/>
         <property key="kseg-length" value=""/>
         <property key="kseg-origin" value=""/>
@@ -359,7 +367,7 @@
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="1d000000-1d03ffff"/>
         <property key="programmerToGoFilePath"
-                  value="C:/Users/estudiante.fit/Desktop/Estudios/UCU/TERCER AÑO/PRIMER SEMESTRE/SISTEMAS OPERATIVOS/proyecto_SistemasOperativos/Proyecto-Final-Embebidos/ProyectoFinal.X/debug/default/ProyectoFinal_ptg"/>
+                  value="C:/FileHistory/estudiante.fit/TOMASABREU/Data/C/Ucu/Tercer Año/Embebidos/Proyecto-Final-Embebidos/ProyectoFinal.X/debug/default/ProyectoFinal_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.pgmentry.voltage" value="low"/>

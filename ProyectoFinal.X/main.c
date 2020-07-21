@@ -75,10 +75,8 @@ void getRealTime(void *p_param);
 void showMenu(void *p_param);
 void sendMessage(void *p_param);
 void sendMessageFinal(void *p_param);
-bool BTN1_pressed = false;
-char textToSendFinal[128];
-TaskHandle_t sendSMSHandler = NULL;
-TaskHandle_t sendSMSHandlerFinal = NULL;
+
+TaskHandle_t takeTemperatureHandle;
 
 /*
                          Main application
@@ -88,14 +86,11 @@ int main(void) {
     SYSTEM_Initialize();
     /* Create the tasks defined within this file. */
     //    
-
-    xTaskCreate(takeTemperature, "Take temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(temperatureSwitch, "Switch temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(getRealTime, "Get real time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
-    xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(SIM808_initModule, "modemIni", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, &modemInitHandle);
-    xTaskCreate(showMenu, "Show Menu", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-
+    xTaskCreate(temperatureSwitch, "Switch temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(getRealTime, "Get real time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(showMenu, "Show Menu", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
+    xTaskCreate(SIM808_initModule, "modemIni", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, &modemInitHandle);
     /* Finally start the scheduler. */
 
     vTaskStartScheduler();
@@ -111,7 +106,11 @@ int main(void) {
 void temperatureSwitch(void *p_param) {
     for (;;) {
         if (BTN1_GetValue()) {
-            BTN1_pressed = !BTN1_pressed;
+            if (takeTemperatureHandle != NULL && eTaskGetState(takeTemperatureHandle) != eDeleted) {
+                vTaskDelete(takeTemperatureHandle);
+            } else {
+                xTaskCreate(takeTemperature, "Take temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &takeTemperatureHandle);
+            }
             RGB_setAllColor(8, RGB_BLACK);
             RGB_showLeds(8);
             while (BTN1_GetValue()) {
@@ -123,8 +122,8 @@ void temperatureSwitch(void *p_param) {
 }
 
 void sendUsb(uint8_t* text) {
-    static uint8_t i;
-    for (i = 0; i < 10 ; i++) {
+    uint8_t i;
+    for (i = 0; i < 10; i++) {
         USB_checkStatus();
         if (USB_getConnectedStatus() && USB_send(text)) {
             break;
@@ -137,39 +136,31 @@ void sendUsb(uint8_t* text) {
 void takeTemperature(void *p_param) {
     // Add your code here
     static uint8_t counterPressed;
-    for (;;) {
-        if (BTN1_pressed) {
-            resetTemperature();
-            for (counterPressed = 0; counterPressed < 10; counterPressed++) {
-                if (!BTN1_pressed) {
-                    break;
-                }
-                if (counterPressed % 2 == 0) {
-                    RGB_setAllColor(8, (getLedColor()[0]));
-                } else {
-                    RGB_setAllColor(8, RGB_BLACK);
-                }
-                measureTemperature();
-                vTaskDelay(pdMS_TO_TICKS(250));
-                RGB_showLeds(8);
-            }
-            if (counterPressed == 10) {
-                averageTemperature();
-                if (checkThreshold()) {
-                    RGB_setAllColor(8, (getLedColor()[1]));
-                } else {
-                    RGB_setAllColor(8, (getLedColor()[2]));
-                }
-                RGB_showLeds(8);
-                xTaskCreate(sendMessage, "Send Message",512 , NULL, tskIDLE_PRIORITY + 2, &sendSMSHandler);
-                BTN1_pressed = false;
-                vTaskDelay(pdMS_TO_TICKS(2000));
-                RGB_setAllColor(8, RGB_BLACK);
-                RGB_showLeds(8);
-            }
+    resetTemperature();
+    for (counterPressed = 0; counterPressed < 10; counterPressed++) {
+        if (counterPressed % 2 == 0) {
+            RGB_setAllColor(8, (getLedColor()[0]));
+        } else {
+            RGB_setAllColor(8, RGB_BLACK);
         }
-        vTaskDelay(pdMS_TO_TICKS(100));
+        measureTemperature();
+        vTaskDelay(pdMS_TO_TICKS(250));
+        RGB_showLeds(8);
     }
+    if (counterPressed == 10) {
+        averageTemperature();
+        if (checkThreshold()) {
+            RGB_setAllColor(8, (getLedColor()[1]));
+        } else {
+            RGB_setAllColor(8, (getLedColor()[2]));
+        }
+        RGB_showLeds(8);
+        xTaskCreate(sendMessage, "Send Message", 512, NULL, tskIDLE_PRIORITY + 1, NULL);
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        RGB_setAllColor(8, RGB_BLACK);
+        RGB_showLeds(8);
+    }
+    vTaskDelete(NULL);
 }
 
 void showMenu(void *p_param) {
@@ -187,7 +178,7 @@ void getRealTime(void *p_param) {
     static bool isValid;
     for (;;) {
         isValid = false;
-        if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE ) {
+        if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
                 if (SIM808_validateNMEAFrame(nmea)) {
                     strncpy(nmeaWithoutConfig, (nmea + 12), strlen(nmea));
@@ -201,7 +192,7 @@ void getRealTime(void *p_param) {
                 }
             }
             xSemaphoreGive(c_semGPSIsReady);
-            if(isValid){
+            if (isValid) {
                 vTaskDelay(pdMS_TO_TICKS(60000));
             }
         }
@@ -209,32 +200,32 @@ void getRealTime(void *p_param) {
     }
 }
 
-void sendSMSFinal(void *p_param) {
-    static uint8_t array[12];
-    static int i;
-    sprintf(array,("\"0%u\""), getPhone());
-    for(i = 0; i < 10; i++){
-        if(c_semGSMIsReady != NULL && xSemaphoreTake(c_semGSMIsReady, portMAX_DELAY) == pdTRUE){
-            SIM808_sendSMS(array,textToSendFinal);
+void sendSMS(void *p_param) {
+    static uint8_t array[13];
+    int i;
+    uint8_t* textToSend = (uint8_t*) p_param;
+    sprintf(array, ("\"0%u\""), getPhone());
+    for (i = 0; i < 10; i++) {
+        if (c_semGSMIsReady != NULL && xSemaphoreTake(c_semGSMIsReady, pdMS_TO_TICKS(1000) ) == pdTRUE) {
+            SIM808_sendSMS(array, textToSend);
             xSemaphoreGive(c_semGSMIsReady);
-            break;
+            vTaskDelete(NULL);
         }
-        vTaskDelay(pdMS_TO_TICKS(50));
     }
-    vTaskDelete(sendSMSHandlerFinal);
+    sendUsb("No se pudo enviar el sms, podria no estar configurado\n");
+    vTaskDelete(NULL);
 }
 
 void sendMessage(void *p_param) {
-    static time_t timeToShow;
-    static struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    static int i;
-    static GPSPosition_t gpsPosition = {0, 0};
-    static uint8_t googleMapsLink[64],nmea[64],nmeaWithoutConfig[64],textToSend[64];
+    time_t timeToShow;
+    struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int i;
+    GPSPosition_t gpsPosition = {0, 0};
+    uint8_t googleMapsLink[64], nmea[64], nmeaWithoutConfig[64], textToSend[64], textSms[128];
     sprintf(textToSend, "La temperatura medida es: %.1f y la temperatura umbral es: %.1f\n", getTemperature(), getThreshold());
-    sendUsb(textToSend);  
-    vTaskDelete(sendSMSHandler);
+    sendUsb(textToSend);
     for (i = 0; i < 10; i++) {
-        if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, pdMS_TO_TICKS(100)) == pdTRUE) {
+        if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, pdMS_TO_TICKS(1000)) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
                 if (SIM808_validateNMEAFrame(nmea)) {
                     strncpy(nmeaWithoutConfig, (nmea + 12), strlen(nmea));
@@ -242,25 +233,25 @@ void sendMessage(void *p_param) {
                     GPS_generateGoogleMaps(googleMapsLink, gpsPosition);
                     RTCC_TimeGet(&time);
                     timeToShow = mktime(&time);
-                    sprintf(textToSendFinal, "%d %s %s %.1f\n", getID(), ctime(&timeToShow), googleMapsLink, getTemperature());
+                    sprintf(textSms, "%d %s %s %.1f\n", getID(), ctime(&timeToShow), googleMapsLink, getTemperature());
                     if (!checkThreshold()) {
-                        sendUsb(textToSendFinal);
-                        //xTaskCreate(sendSMSFinal, "sendSMSFinal", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &sendSMSHandlerFinal);
+                        sendUsb(textSms);
+                        xTaskCreate(sendSMS, "sendSMSFinal", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
                     }
-                    if (saveLog(textToSendFinal)) {
+                    if (saveLog(textSms)) {
                         sendUsb("Temperatura guardada correctamente.\n");
                     } else {
                         sendUsb("No se pudo guardar la temperatura, memoria llena.\n");
                     }
                     xSemaphoreGive(c_semGPSIsReady);
-                    vTaskDelete(sendSMSHandler);
+                    vTaskDelete(NULL);
                 }
             }
             xSemaphoreGive(c_semGPSIsReady);
         }
     }
     sendUsb("No hay acceso a la informacion necesaria, Intentelo nuevamente\n");
-    vTaskDelete(sendSMSHandler);
+    vTaskDelete(NULL);
 }
 
 void vApplicationMallocFailedHook(void) {

@@ -41,7 +41,7 @@
     banner.
  */
 
-static uint32_t phoneNumber = 91969979;
+static uint32_t phoneNumber = 99535316;
 static uint32_t id = 1234;
 static enum rgb_colors ledColor[3] = {RGB_BLUE, RGB_GREEN, RGB_RED};
 
