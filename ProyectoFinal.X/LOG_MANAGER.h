@@ -76,6 +76,8 @@ extern "C" {
         banner.
      */
     bool saveLog(uint8_t* sentence);
+    int getlastTemperatureIndex();
+    char* getLog(int index);
 
 
     /* Provide C++ Compatibility */

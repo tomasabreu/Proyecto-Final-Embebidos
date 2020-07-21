@@ -221,7 +221,7 @@ void sendMessage(void *p_param) {
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int i;
     GPSPosition_t gpsPosition = {0, 0};
-    uint8_t googleMapsLink[64], nmea[64], nmeaWithoutConfig[64], textToSend[64], textSms[128];
+    uint8_t googleMapsLink[64], nmea[64], nmeaWithoutConfig[64], textToSend[128], textSms[128];
     sprintf(textToSend, "La temperatura medida es: %.1f y la temperatura umbral es: %.1f\n", getTemperature(), getThreshold());
     sendUsb(textToSend);
     for (i = 0; i < 10; i++) {

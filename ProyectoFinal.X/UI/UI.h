@@ -116,6 +116,7 @@ extern "C" {
         UI_MENU_STATE_TEMPERATURE_THRESHOLD_CHANGE,
         UI_MENU_STATE_PHONE_CHANGE,
         UI_MENU_STATE_LED_COLOR_CHANGE,
+        UI_MENU_STATE_SHOW_ALL_LOGS,
     } ui_menu_states_t;
 
     // *****************************************************************************
@@ -185,6 +186,8 @@ extern "C" {
     bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray);
     
     bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray);
+    
+    bool switchShowAllLog(int* counter);
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

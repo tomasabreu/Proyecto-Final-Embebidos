@@ -25,6 +25,8 @@
  */
 
 #include "LOG_MANAGER.h"
+#include <string.h>
+#include <stdio.h>
 
 /* TODO:  Include other files here if needed. */
 
@@ -38,9 +40,9 @@
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-#define amountOfSaveTemperatures 200
-static uint8_t* savedTemperatures[amountOfSaveTemperatures];
-static int lastTemperatureSaved = 0;
+#define amountOfSaveTemperatures 10
+static char savedTemperatures[amountOfSaveTemperatures][128];
+static int lastTemperatureIndex = 0;
 
 
 
@@ -67,15 +69,25 @@ static int lastTemperatureSaved = 0;
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-bool saveLog(uint8_t* sentence){
-    lastTemperatureSaved++;
-    if (lastTemperatureSaved < amountOfSaveTemperatures) {
-        savedTemperatures[lastTemperatureSaved] = sentence;
+bool saveLog(uint8_t* sentence) {
+    if (lastTemperatureIndex < amountOfSaveTemperatures) {
+        memcpy(savedTemperatures[lastTemperatureIndex], sentence, strlen(sentence));    
+        lastTemperatureIndex++;
         return true;
     }
     return false;
 }
 
+int getLastTemperatureIndex() {
+    return lastTemperatureIndex;
+}
+
+char* getLog(int index){
+    if(index < lastTemperatureIndex){
+        return savedTemperatures[index];
+    }
+    return NULL;
+}
 /* *****************************************************************************
  End of File
  */
