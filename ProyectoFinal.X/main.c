@@ -103,6 +103,19 @@ int main(void) {
     for (;;);
 }
 
+
+/** 
+ * @Function
+ *    void temperatureSwitch(void *p_param)
+ *
+ * @Summary
+ *   Esta es una tarea encargada de ver cuando el boton es tocado, si fue tocado crea la tarea de tomar la temperatura 
+ *  "take temperature".
+ *  A su vez resetea los les a su color estandar (negro)
+ *  
+ *  
+ * 
+ */
 void temperatureSwitch(void *p_param) {
     for (;;) {
         if (BTN1_GetValue()) {
@@ -121,6 +134,17 @@ void temperatureSwitch(void *p_param) {
     }
 }
 
+
+/** 
+ * @Function
+ *    void sendUsb(uint8_t* text)
+ *
+ * @Summary
+ *   Este se encarga de mandar por usb un texto dado, si este falla un numero de veces en este caso 10, se libera.
+ *  
+ *  
+ * @Param: uint8_t* text: el texto el cual se quiere mandar por usb hacia el hercules.
+ */
 void sendUsb(uint8_t* text) {
     uint8_t i;
     for (i = 0; i < 10; i++) {
@@ -133,6 +157,24 @@ void sendUsb(uint8_t* text) {
     USB_checkStatus();
 }
 
+
+/** 
+ * @Function
+ *    void takeTemperature(void *p_param)
+ *
+ * @Summary
+ *   Tarea encargada de medir las temperaturas dependiendo de el ADC, una vez que toma las 10 temperaturas
+ *  hace un promedio de las mismas y con el resultado se comprueba si esta por arriba del umbral o por abajo.
+ *  
+ *  <Por arriba>
+ *      Si la temperatura esta por arriba del umbral setea los leds a color rojo y crea la tarea de "sendMessage".
+ * 
+ *  <Por debajo>
+ *      Si la temperatura esta por debajo del umbral setea los leds a color verde y crea la tarea de "sendMessage".
+ * 
+ *  Una vez que pasan 2 segundos se apagan los leds poniendolos de color negro.
+ *  
+ */
 void takeTemperature(void *p_param) {
     // Add your code here
     static uint8_t counterPressed;
@@ -163,6 +205,16 @@ void takeTemperature(void *p_param) {
     vTaskDelete(NULL);
 }
 
+
+/** 
+ * @Function
+ *    void showMenu(void *p_param)
+ *
+ * @Summary
+ *   Tarea encargada de crear el menu UI o interfaz grafica.
+ *  Esta tarea se encargada de llamar a la funcion para mostrar el menu.
+ *  
+ */
 void showMenu(void *p_param) {
     for (;;) {
         UI_showMenu();
@@ -170,6 +222,17 @@ void showMenu(void *p_param) {
     }
 }
 
+
+/** 
+ * @Function
+ *    void getRealTime(void *p_param)
+ *
+ * @Summary
+ *   Tarea encargada de medir el tiempo real con el GPS, para esto la tarea primero obtiene y verifica la trama
+ *  Una vez la trama es correcta, se pide el tiempo que el GPS obtiene utilizando un metodo del SIM808 y luego se configura
+ *  el tiempo dentro de la placa.
+ *  
+ */
 void getRealTime(void *p_param) {
     static time_t timeToShow;
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -215,6 +278,8 @@ void sendSMS(void *p_param) {
     sendUsb("No se pudo enviar el sms, podria no estar configurado\n");
     vTaskDelete(NULL);
 }
+
+
 
 void sendMessage(void *p_param) {
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
