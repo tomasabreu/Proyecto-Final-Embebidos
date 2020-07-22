@@ -197,7 +197,7 @@ bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray) {
                 return false;
             }
         case 2:
-            if (UI_checkValidOption(dataArray, UI_OPTION_NUM, 4294967295, 0)) {
+            if (UI_checkValidOption(dataArray, UI_OPTION_NUM, 4294967295.0, 0)) {
                 sscanf(dataArray, "%u", &id);
                 setID(id);
                 USB_send("\nSe cambio exitosamente el ID del dispositivo\n");
@@ -228,9 +228,9 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
                 sscanf(dataArray1, "%f", &umbral);
                 strcpy(array, dataArray1);
                 setThreshold(umbral);
-                USB_send("\nSe cambio exitosamente la temperatura umbral\n");
+                USB_send("\nSe cambió exitosamente la temperatura umbral\n");
             } else {
-                USB_send("\nPor favor ingrese un valor válido entre 32 y 42\n");
+                USB_send("\nPor favor ingrese un valor válido entre 32 y 42 grados\n");
             }
             *counter = 0;
             return true;
@@ -271,7 +271,7 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
 
     switch (*counter) {
         case 0:
-            USB_send("\nIngrese numeros del 0 al 3.\n0 = Blanco\n1 = Rojo\n2 = Verde\n3 = Azul\nEl formato es \"1,2,3\"\nEl primer numero es el color parpadiante al medir la temperatura\nEl segundo se presenta cuando la temperatura es menor al umbral\nY tercero cuando es mayor.\n");
+            USB_send("\nIngrese números desde 0 a 3.\n0 = Blanco\n1 = Rojo\n2 = Verde\n3 = Azul\nEl formato es \"1,2,3\"\nEl primer número es el color parpadiante al medir la temperatura\nEl segundo se presenta cuando la temperatura es menor al umbral\nY tercero cuando es mayor.\n");
             (*counter)++;
             return false;
         case 1:
@@ -288,7 +288,7 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
                 USB_send("\nSe cambió exitosamente los colores\n");
                 setLedColor(arrayColors);
             } else {
-                USB_send("\nLos datos ingresados no respetan el formato, por favor ingrese los numeros de los colors correspondientes siendo estos 0,1,2,3\n");
+                USB_send("\nLos datos ingresados no respetan el formato, por favor ingrese los números de los colores correspondientes siendo estos 0,1,2,3\n");
             }
             *counter = 0;
             return true;
@@ -297,14 +297,21 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
 
 bool switchShowAllLog(int* counter) {
     static int i = 0;
+    static uint8_t logText[128];
     switch (*counter) {
         case 0:
-            USB_send("\nEl log guardado hasta el momento es el siguiente:\n");
+            if (i < getLastTemperatureIndex()) {
+                USB_send("\nEl log guardado hasta el momento es el siguiente:\n");
+            }
+            else{
+                USB_send("\nEl log de datos está vacio\n");
+            }
             (*counter)++;
             return false;
         case 1:
             if (i < getLastTemperatureIndex()) {
-                if (USB_send(getLog(i))) {
+                getLog(i,logText);
+                if (logText) {
                     i++;
                 }
                 return false;

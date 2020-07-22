@@ -27,7 +27,8 @@
 
 #include "stdint.h"
 #include "stdbool.h"
-
+#include "GPS/GPS.h"
+#include "time.h"
 /* This section lists the other files that are included in this file.
  */
 
@@ -64,6 +65,12 @@ extern "C" {
         banner.
      */
 
+    typedef struct {
+        uint32_t id;
+        time_t time;
+        GPSPosition_t gps;
+        float temperature;
+    } logData;
 
 
     // *****************************************************************************
@@ -75,9 +82,10 @@ extern "C" {
     /*  A brief description of a section can be given directly below the section
         banner.
      */
-    bool saveLog(uint8_t* sentence);
+    bool saveLog(logData log);
     int getlastTemperatureIndex();
-    char* getLog(int index);
+    void getLog(int index, uint8_t* textToSave);
+    void generateMessage(logData logToGenerate, uint8_t* textToSave);
 
 
     /* Provide C++ Compatibility */

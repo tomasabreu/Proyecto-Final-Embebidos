@@ -40,8 +40,8 @@
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-#define amountOfSaveTemperatures 10
-static char savedTemperatures[amountOfSaveTemperatures][128];
+#define amountOfSaveTemperatures 200
+static logData savedTemperatures[amountOfSaveTemperatures];
 static int lastTemperatureIndex = 0;
 
 
@@ -69,9 +69,12 @@ static int lastTemperatureIndex = 0;
 /*  A brief description of a section can be given directly below the section
     banner.
  */
-bool saveLog(uint8_t* sentence) {
+bool saveLog(logData log) {
     if (lastTemperatureIndex < amountOfSaveTemperatures) {
-        memcpy(savedTemperatures[lastTemperatureIndex], sentence, strlen(sentence));    
+        savedTemperatures[lastTemperatureIndex].id = log.id;
+        savedTemperatures[lastTemperatureIndex].gps = log.gps;    
+        savedTemperatures[lastTemperatureIndex].temperature = log.temperature;    
+        savedTemperatures[lastTemperatureIndex].time = log.time;    
         lastTemperatureIndex++;
         return true;
     }
@@ -82,11 +85,16 @@ int getLastTemperatureIndex() {
     return lastTemperatureIndex;
 }
 
-char* getLog(int index){
+void getLog(int index, uint8_t* textToSave){
     if(index < lastTemperatureIndex){
-        return savedTemperatures[index];
+        generateMessage(savedTemperatures[index],textToSave);
     }
-    return NULL;
+}
+
+void generateMessage(logData logToGenerate, uint8_t* textToSave){
+    uint8_t googleMapsLink[64];
+    GPS_generateGoogleMaps(googleMapsLink, logToGenerate.gps);
+    sprintf(textToSave, "%d %s %s %.1f\n", logToGenerate.id, ctime(&logToGenerate.time), googleMapsLink, logToGenerate.temperature);
 }
 /* *****************************************************************************
  End of File

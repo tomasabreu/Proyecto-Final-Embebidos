@@ -217,11 +217,10 @@ void sendSMS(void *p_param) {
 }
 
 void sendMessage(void *p_param) {
-    time_t timeToShow;
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int i;
-    GPSPosition_t gpsPosition = {0, 0};
-    uint8_t googleMapsLink[64], nmea[64], nmeaWithoutConfig[64], textToSend[128], textSms[128];
+    logData logToSave;
+    uint8_t nmea[64], nmeaWithoutConfig[64], textToSend[65], textSms[128];
     sprintf(textToSend, "La temperatura medida es: %.1f y la temperatura umbral es: %.1f\n", getTemperature(), getThreshold());
     sendUsb(textToSend);
     for (i = 0; i < 10; i++) {
@@ -229,16 +228,17 @@ void sendMessage(void *p_param) {
             if (SIM808_getNMEA(nmea)) {
                 if (SIM808_validateNMEAFrame(nmea)) {
                     strncpy(nmeaWithoutConfig, (nmea + 12), strlen(nmea));
-                    GPS_getPosition(&gpsPosition, nmeaWithoutConfig);
-                    GPS_generateGoogleMaps(googleMapsLink, gpsPosition);
                     RTCC_TimeGet(&time);
-                    timeToShow = mktime(&time);
-                    sprintf(textSms, "%d %s %s %.1f\n", getID(), ctime(&timeToShow), googleMapsLink, getTemperature());
+                    logToSave.time = mktime(&time);
+                    GPS_getPosition(&logToSave.gps, nmeaWithoutConfig);
+                    logToSave.id = getID();
+                    logToSave.temperature = getTemperature();
+                    generateMessage(logToSave,textSms);
                     if (!checkThreshold()) {
                         sendUsb(textSms);
                         xTaskCreate(sendSMS, "sendSMSFinal", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
                     }
-                    if (saveLog(textSms)) {
+                    if (saveLog(logToSave)) {
                         sendUsb("Temperatura guardada correctamente.\n");
                     } else {
                         sendUsb("No se pudo guardar la temperatura, memoria llena.\n");
