@@ -103,15 +103,14 @@ int main(void) {
     for (;;);
 }
 
-
 /** 
  * @Function
  *    void temperatureSwitch(void *p_param)
  *
  * @Summary
  *   Esta es una tarea encargada de ver cuando el boton es tocado, si fue tocado crea la tarea de tomar la temperatura 
- *  "take temperature".
- *  A su vez resetea los les a su color estandar (negro)
+ *  "take temperature" pero si esta tarea se estaba ejecutando, se elimina.
+ *  A su vez resetea los leds a su color estandar (negro)
  *  
  *  
  * 
@@ -119,13 +118,13 @@ int main(void) {
 void temperatureSwitch(void *p_param) {
     for (;;) {
         if (BTN1_GetValue()) {
+            RGB_setAllColor(8, RGB_BLACK);
+            RGB_showLeds(8);
             if (takeTemperatureHandle != NULL && eTaskGetState(takeTemperatureHandle) != eDeleted) {
                 vTaskDelete(takeTemperatureHandle);
             } else {
                 xTaskCreate(takeTemperature, "Take temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &takeTemperatureHandle);
             }
-            RGB_setAllColor(8, RGB_BLACK);
-            RGB_showLeds(8);
             while (BTN1_GetValue()) {
                 vTaskDelay(pdMS_TO_TICKS(100));
             }
@@ -134,16 +133,15 @@ void temperatureSwitch(void *p_param) {
     }
 }
 
-
 /** 
  * @Function
  *    void sendUsb(uint8_t* text)
  *
  * @Summary
- *   Este se encarga de mandar por usb un texto dado, si este falla un numero de veces en este caso 10, se libera.
+ *   Este se encarga de mandar por usb un texto dado, si este falla un número de veces en este caso 10, se libera.
  *  
  *  
- * @Param: uint8_t* text: el texto el cual se quiere mandar por usb hacia el hercules.
+ * @Param: uint8_t* text: texto que se envia por el puerto usb.
  */
 void sendUsb(uint8_t* text) {
     uint8_t i;
@@ -157,7 +155,6 @@ void sendUsb(uint8_t* text) {
     USB_checkStatus();
 }
 
-
 /** 
  * @Function
  *    void takeTemperature(void *p_param)
@@ -166,13 +163,14 @@ void sendUsb(uint8_t* text) {
  *   Tarea encargada de medir las temperaturas dependiendo de el ADC, una vez que toma las 10 temperaturas
  *  hace un promedio de las mismas y con el resultado se comprueba si esta por arriba del umbral o por abajo.
  *  
- *  <Por arriba>
- *      Si la temperatura esta por arriba del umbral setea los leds a color rojo y crea la tarea de "sendMessage".
+ *  <Por arriba> del umbral.
+ *      Si la temperatura esta por arriba del umbral setea los leds a color rojo.
  * 
- *  <Por debajo>
- *      Si la temperatura esta por debajo del umbral setea los leds a color verde y crea la tarea de "sendMessage".
+ *  <Por debajo> del umbral.
+ *      Si la temperatura esta por debajo del umbral setea los leds a color verde.
  * 
- *  Una vez que pasan 2 segundos se apagan los leds poniendolos de color negro.
+ *  Crea la tarea de "sendMessage".
+ *  Una vez pasan 2 segundos se apagan los leds.
  *  
  */
 void takeTemperature(void *p_param) {
@@ -205,7 +203,6 @@ void takeTemperature(void *p_param) {
     vTaskDelete(NULL);
 }
 
-
 /** 
  * @Function
  *    void showMenu(void *p_param)
@@ -222,17 +219,16 @@ void showMenu(void *p_param) {
     }
 }
 
-
 /** 
  * @Function
  *    void getRealTime(void *p_param)
  *
  * @Summary
  *   Tarea encargada de medir el tiempo real con el GPS, para esto la tarea primero obtiene y verifica la trama
- *  Una vez la trama es correcta, se pide el tiempo que el GPS obtiene utilizando un metodo del SIM808 y luego se configura
- *  el tiempo dentro de la placa.
+ *  Una vez la trama es correcta, se pide el tiempo que el GPS obtiene utilizando un metodo del modulo SIM808 y luego se configura
+ *  el tiempo dentro de la placa .
  * 
- *  <time.tm_hour -= 3> se utiliza ya que la hora que el gps da es 3 hs despues.
+ *  <time.tm_hour -= 3> se utiliza ya que la hora que el gps es UTC y en Uruguay se maneja UTC-3
  *  
  */
 void getRealTime(void *p_param) {
@@ -265,16 +261,15 @@ void getRealTime(void *p_param) {
     }
 }
 
-
 /** 
  * @Function
  *    void sendSMS(void *p_param)
  *
  * @Summary
- *   Tarea encargada de enviar el mensaje de texto, esta tarea llama al metodo creado en SIM808 el cual envia el mensaje
- *  Mientas que la tarea consigue el telefono y el texto para poder enviar el mensaje correctamente.
- * 
- *  
+ *   Tarea encargada de enviar el mensaje de texto obtenido por parametro.
+ *   Obtiene el telefono al cual enviar el mensaje desde el modulo DATA_MANAGER
+ *   Esta tarea llama al metodo creado en SIM808 el cual envia el mensaje al respectivo celular obtenido.
+ *      
  */
 void sendSMS(void *p_param) {
     static uint8_t array[13];
@@ -282,7 +277,7 @@ void sendSMS(void *p_param) {
     uint8_t* textToSend = (uint8_t*) p_param;
     sprintf(array, ("\"0%u\""), getPhone());
     for (i = 0; i < 10; i++) {
-        if (c_semGSMIsReady != NULL && xSemaphoreTake(c_semGSMIsReady, pdMS_TO_TICKS(1000) ) == pdTRUE) {
+        if (c_semGSMIsReady != NULL && xSemaphoreTake(c_semGSMIsReady, pdMS_TO_TICKS(1000)) == pdTRUE) {
             SIM808_sendSMS(array, textToSend);
             xSemaphoreGive(c_semGSMIsReady);
             vTaskDelete(NULL);
@@ -292,20 +287,17 @@ void sendSMS(void *p_param) {
     vTaskDelete(NULL);
 }
 
-
 /** 
  * @Function
  *    void sendMessage(void *p_param)
  *
  * @Summary
- *   Tarea encargada de enviar los mensajes por el usb y de crear la tarea de enviar el SMS.
- *  En esta tarea primero se manda la medida de temperatura medida anteriomente.
- *  Luego de eso, se obtiene la trama y se verifica para poder obtener la posicion GPS y crear el mensaje para mandar
- *  en el SMS y guardarlo en el log.
- *  Una vez creado el mensaje se crea la tarea "sendSMS" para enviar el mensaje de texto si la temperatura fue mayor
- *  al umbral y luego se guardar el mensaje para el log de datos.
- * 
- *  
+ *   Tarea encargada de generar los envios de los mensajes por usb y sms.
+ *   Primero, se envia por el puero USB la tempreatura obtenida.
+ *   Luego, se obtiene la trama y se valida para poder obtener la posicion GPS.
+ *   Los valores de localización, tiempo, id del dispositivo y temperatura, son guardados en una variable de tipo logData.
+ *   Se guarda el log obtenido en el modulo LOG_MANAGER
+ *   Si la temperatura fue mayor al umbral, se genera el mensaje y se crea la tarea "sendSMS".
  */
 void sendMessage(void *p_param) {
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -324,15 +316,15 @@ void sendMessage(void *p_param) {
                     GPS_getPosition(&logToSave.gps, nmeaWithoutConfig);
                     logToSave.id = getID();
                     logToSave.temperature = getTemperature();
-                    generateMessage(logToSave,textSms);
-                    if (!checkThreshold()) {
-                        sendUsb(textSms);
-                        xTaskCreate(sendSMS, "sendSMSFinal", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
-                    }
                     if (saveLog(logToSave)) {
                         sendUsb("Temperatura guardada correctamente.\n");
                     } else {
                         sendUsb("No se pudo guardar la temperatura, memoria llena.\n");
+                    }
+                    if (!checkThreshold()) {
+                        generateMessage(logToSave, textSms);
+                        sendUsb(textSms);
+                        xTaskCreate(sendSMS, "sendSMSFinal", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
                     }
                     xSemaphoreGive(c_semGPSIsReady);
                     vTaskDelete(NULL);
