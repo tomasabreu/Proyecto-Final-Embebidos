@@ -61,7 +61,7 @@
     Any additional remarks
  */
 const uint8_t ui_welcomeText[] = "Bienvenido al Proyecto de Sistemas Embebidos\nPor favor presione una tecla para continuar...\n";
-const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\n1) Cambiar el ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono al que se le manda el mensaje\n4) Cambiar los colores de las medidas de temperatura\n5) Mostrar el log de datos\n";
+const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\nPara tomar la temperatura presione el botón s2 de la placa\n1) Cambiar ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono receptor de advertencias\n4) Cambiar los colores de las medidas de temperatura\n5) Mostrar el log de datos\n";
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -187,7 +187,7 @@ bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray) {
     uint32_t id;
     switch (*counter) {
         case 0:
-            USB_send("\nIngrese el ID del dispositivo, debe ser un número de 32 bits entre 0 y 4294967295\n");
+            USB_send("\nIngrese el ID del dispositivo, debe ser un número entero de 32 bits entre 0 y 4294967295\n");
             (*counter)++;
             return false;
         case 1:
@@ -271,7 +271,7 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
 
     switch (*counter) {
         case 0:
-            USB_send("\nIngrese números desde 0 a 3.\n0 = Blanco\n1 = Rojo\n2 = Verde\n3 = Azul\nEl formato es \"1,2,3\"\nEl primer número es el color parpadiante al medir la temperatura\nEl segundo se presenta cuando la temperatura es menor al umbral\nY tercero cuando es mayor.\n");
+            USB_send("\nIngrese números desde 0 a 3.\n0 = Blanco\n1 = Rojo\n2 = Verde\n3 = Azul\nEl formato es \"1,2,3\"\nEl primer número es el color parpadeante al medir la temperatura\nEl segundo se presenta cuando la temperatura es menor al umbral\nY tercero cuando es mayor.\n");
             (*counter)++;
             return false;
         case 1:
