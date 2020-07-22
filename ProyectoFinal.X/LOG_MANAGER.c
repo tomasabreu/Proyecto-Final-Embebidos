@@ -69,6 +69,17 @@ static int lastTemperatureIndex = 0;
 /*  A brief description of a section can be given directly below the section
     banner.
  */
+
+
+/** 
+ * @Function
+ *    bool saveLog(logData log)
+ *
+ * @Summary
+ *   Esta funcion se encarga de salvar cada uno de los atributos que se necesita salvar en el log de datos.
+ * @Param:
+ *   el log que tiene los atributos para guardar.
+ */
 bool saveLog(logData log) {
     if (lastTemperatureIndex < amountOfSaveTemperatures) {
         savedTemperatures[lastTemperatureIndex].id = log.id;
@@ -81,16 +92,48 @@ bool saveLog(logData log) {
     return false;
 }
 
+
+/** 
+ * @Function
+ *    int getLastTemperatureIndex()
+ *
+ * @Summary
+ *   Esta funcion se encarga dar el tamaño del log de datos hasta el momento.
+ * 
+ */
 int getLastTemperatureIndex() {
     return lastTemperatureIndex;
 }
 
+
+
+/** 
+ * @Function
+ *    void getLog(int index, uint8_t* textToSave)
+ *
+ * @Summary
+ *   Esta funcion se encarga dar el log de datos.
+ * @Param:
+ *   index -> el index es el lugar donde esta el log de datos en el array con logs de datos
+ *   textToSend -> el mensaje para ser enviado.
+ */
 void getLog(int index, uint8_t* textToSave){
     if(index < lastTemperatureIndex){
         generateMessage(savedTemperatures[index],textToSave);
     }
 }
 
+
+/** 
+ * @Function
+ *    void generateMessage(logData logToGenerate, uint8_t* textToSave)
+ *
+ * @Summary
+ *   Esta funcion se encarga generar el mensaje completo para ser enviado por mensaje de texto.
+ * @Param:
+ *   logToGenerate -> este es el log que quiere ser generado.
+ *   textoToSend -> el lugar para guardar el mensaje.
+ */
 void generateMessage(logData logToGenerate, uint8_t* textToSave){
     uint8_t googleMapsLink[64];
     GPS_generateGoogleMaps(googleMapsLink, logToGenerate.gps);

@@ -231,6 +231,8 @@ void showMenu(void *p_param) {
  *   Tarea encargada de medir el tiempo real con el GPS, para esto la tarea primero obtiene y verifica la trama
  *  Una vez la trama es correcta, se pide el tiempo que el GPS obtiene utilizando un metodo del SIM808 y luego se configura
  *  el tiempo dentro de la placa.
+ * 
+ *  <time.tm_hour -= 3> se utiliza ya que la hora que el gps da es 3 hs despues.
  *  
  */
 void getRealTime(void *p_param) {
@@ -263,6 +265,17 @@ void getRealTime(void *p_param) {
     }
 }
 
+
+/** 
+ * @Function
+ *    void sendSMS(void *p_param)
+ *
+ * @Summary
+ *   Tarea encargada de enviar el mensaje de texto, esta tarea llama al metodo creado en SIM808 el cual envia el mensaje
+ *  Mientas que la tarea consigue el telefono y el texto para poder enviar el mensaje correctamente.
+ * 
+ *  
+ */
 void sendSMS(void *p_param) {
     static uint8_t array[13];
     int i;
@@ -280,7 +293,20 @@ void sendSMS(void *p_param) {
 }
 
 
-
+/** 
+ * @Function
+ *    void sendMessage(void *p_param)
+ *
+ * @Summary
+ *   Tarea encargada de enviar los mensajes por el usb y de crear la tarea de enviar el SMS.
+ *  En esta tarea primero se manda la medida de temperatura medida anteriomente.
+ *  Luego de eso, se obtiene la trama y se verifica para poder obtener la posicion GPS y crear el mensaje para mandar
+ *  en el SMS y guardarlo en el log.
+ *  Una vez creado el mensaje se crea la tarea "sendSMS" para enviar el mensaje de texto si la temperatura fue mayor
+ *  al umbral y luego se guardar el mensaje para el log de datos.
+ * 
+ *  
+ */
 void sendMessage(void *p_param) {
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int i;
