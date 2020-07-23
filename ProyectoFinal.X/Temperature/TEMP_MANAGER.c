@@ -72,34 +72,98 @@ double round(double x) {
 
 // *****************************************************************************
 
+
+/** 
+ * @Function
+ *    void measureTemperature()
+ *
+ * @Summary
+ *   Funcion encargada de mediar la temperatura del adc.
+ *  
+ */
 void measureTemperature() {
     temperature += (ADC1_GetConversion(TEMP) / 102.3) + 32.0;
 }
 
+
+/** 
+ * @Function
+ *   float getTemperature()
+ *
+ * @Summary
+ *   Funcion encargada de dar la temperatura
+ *  
+ */
 float getTemperature() {
     return temperature;
 }
 
+
+/** 
+ * @Function
+ *   float getThreshold()
+ *
+ * @Summary
+ *   Funcion encargada de dar la temperatura umbral.
+ *  
+ */
 float getThreshold(){    
     return thresholdTemperature; 
 }
 
+/** 
+ * @Function
+ *   void averageTemperature()
+ *
+ * @Summary
+ *   Funcion encargada de conseguir la temperatura media.
+ *  
+ */
 void averageTemperature() {
     temperature /= 10.0;
     temperature = round(10.0 * temperature) / 10.0;
 }
 
+
+/** 
+ * @Function
+ *   void resetTemperature()
+ *
+ * @Summary
+ *   Funcion encargada de resetear la temperatura una vez medida,o si se queda por la mitad.
+ *  
+ */
 void resetTemperature() {
     temperature = 0;
 }
 
 
+/** 
+ * @Function
+ *   void setThreshold(float temperature)
+ *
+ * @Summary
+ *   Funcion encargada de setear la temperatura umbral del sistema.
+ * 
+ * @Param
+ *  temperature -> la temperatura umbral a setear.
+ *  
+ */
 void setThreshold(float temperature) {
     thresholdTemperature = temperature;
 }
 
+
+/** 
+ * @Function
+ *   bool checkThreshold()
+ *
+ * @Summary
+ *   Funcion encargada de checkear si la temperatura de la persona a medir, es menor a la temperatura umbral.
+ *  
+ */
 bool checkThreshold() {
-    return temperature<=thresholdTemperature;
+    return temperature <= thresholdTemperature;
 }
 
 
