@@ -234,7 +234,7 @@ void showMenu(void *p_param) {
 void getRealTime(void *p_param) {
     static time_t timeToShow;
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    static uint8_t nmea[64], nmeaWithoutConfig[64];
+    static uint8_t nmea[64];
     static char textToSend[64];
     static bool isValid;
     for (;;) {
@@ -242,8 +242,7 @@ void getRealTime(void *p_param) {
         if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, portMAX_DELAY) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
                 if (SIM808_validateNMEAFrame(nmea)) {
-                    strncpy(nmeaWithoutConfig, (nmea + 12), strlen(nmea));
-                    GPS_getUTC(&time, nmeaWithoutConfig);
+                    GPS_getUTC(&time, strstr(nmea,"+CGNSINF:")+10);
                     time.tm_hour -= 3;
                     RTCC_TimeSet(&time);
                     timeToShow = mktime(&time);
@@ -254,7 +253,7 @@ void getRealTime(void *p_param) {
             }
             xSemaphoreGive(c_semGPSIsReady);
             if (isValid) {
-                vTaskDelay(pdMS_TO_TICKS(60000));
+                vTaskDelay(pdMS_TO_TICKS(60000*5));
             }
         }
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -303,17 +302,16 @@ void sendMessage(void *p_param) {
     struct tm time = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int i;
     logData logToSave;
-    uint8_t nmea[64], nmeaWithoutConfig[64], textToSend[65], textSms[128];
+    uint8_t nmea[64], textToSend[65], textSms[128];
     sprintf(textToSend, "La temperatura medida es: %.1f y la temperatura umbral es: %.1f\n", getTemperature(), getThreshold());
     sendUsb(textToSend);
     for (i = 0; i < 10; i++) {
         if (c_semGPSIsReady != NULL && xSemaphoreTake(c_semGPSIsReady, pdMS_TO_TICKS(1000)) == pdTRUE) {
             if (SIM808_getNMEA(nmea)) {
-                if (SIM808_validateNMEAFrame(nmea)) {
-                    strncpy(nmeaWithoutConfig, (nmea + 12), strlen(nmea));
+                if (SIM808_validateNMEAFrame(nmea)) {           
                     RTCC_TimeGet(&time);
                     logToSave.time = mktime(&time);
-                    GPS_getPosition(&logToSave.gps, nmeaWithoutConfig);
+                    GPS_getPosition(&logToSave.gps, strstr(nmea,"+CGNSINF:")+10);
                     logToSave.id = getID();
                     logToSave.temperature = getTemperature();
                     if (saveLog(logToSave)) {

@@ -61,8 +61,8 @@
     Any additional remarks
  */
 const uint8_t ui_welcomeText[] = "Bienvenido al Proyecto de Sistemas Embebidos\nPor favor presione una tecla para continuar...\n";
-const uint8_t ui_optionsText[] = "\nIndique la opción deseada:\nPara tomar la temperatura presione el botón s2 de la placa\n1) Cambiar ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono receptor de advertencias\n4) Cambiar los colores de las medidas de temperatura\n5) Mostrar el log de datos\n";
-
+const uint8_t ui_optionsText2[] = "1) Cambiar ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono receptor de advertencias\n4) Cambiar los colores de las medidas de temperatura\n5) Mostrar el log de datos\n";
+const uint8_t ui_optionsText1[] = "\nIndique la opción deseada:\nPara tomar la temperatura presione el botón s2 de la placa\n";
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Local Functions                                                   */
@@ -112,9 +112,19 @@ void UI_showMenu(void) {
                 }
                 break;
             case( UI_MENU_STATE_OPTIONS_SHOW):
-                if (USB_send((uint8_t*) ui_optionsText)) {
-                    memset(dataArray1, 0, sizeof (dataArray1));
-                    menuState = UI_MENU_STATE_OPTIONS_WAIT;
+                switch (counter) {
+                    case 0:
+                        if (USB_send((uint8_t*) ui_optionsText1)) {
+                            counter++;
+                        }
+                        break;
+                    case 1:
+                        if (USB_send((uint8_t*) ui_optionsText2)) {
+                            memset(dataArray1, 0, sizeof (dataArray1));
+                            menuState = UI_MENU_STATE_OPTIONS_WAIT;
+                            counter = 0;
+                        }
+                        break;
                 }
                 break;
             case( UI_MENU_STATE_OPTIONS_WAIT):
@@ -211,7 +221,6 @@ bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray) {
 
 bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
     float umbral;
-    uint8_t array[10];
     switch (*counter) {
         case 0:
             USB_send("\nIngrese la temperatura umbral nueva\n");
@@ -223,10 +232,12 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
                 (*counter)++;
                 return false;
             }
-        case 2:
-            if (UI_checkValidOption(dataArray1, UI_OPTION_NUM, 42, 32)) {
-                sscanf(dataArray1, "%f", &umbral);
-                strcpy(array, dataArray1);
+        case 2: 
+            if(dataArray1[2]==','){
+                dataArray1[2]='.';
+            }
+            sscanf(dataArray1, "%f", &umbral);
+            if (umbral<=42.0 && umbral >=32.0) {
                 setThreshold(umbral);
                 USB_send("\nSe cambió exitosamente la temperatura umbral\n");
             } else {
@@ -256,7 +267,7 @@ bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
                 setPhone(newPhone);
                 USB_send("\nSe cambió exitosamente el número telefónico\n");
             } else {
-                USB_send("\nPor favor número válido\n");
+                USB_send("\nPor favor ingrese un número válido\n");
             }
             *counter = 0;
             return true;
@@ -281,7 +292,6 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
                 return false;
             }
         case 2:
-
             sscanf(dataArray, "%d,%d,%d", &firstColor, &secondColor, &thirdColor);
             if (firstColor >= 0 && firstColor < 4 && secondColor >= 0 && secondColor < 4 && thirdColor >= 0 && thirdColor < 4) {
                 uint8_t arrayColors[3] = {firstColor, secondColor, thirdColor};
@@ -302,15 +312,14 @@ bool switchShowAllLog(int* counter) {
         case 0:
             if (i < getLastTemperatureIndex()) {
                 USB_send("\nEl log guardado hasta el momento es el siguiente:\n");
-            }
-            else{
+            } else {
                 USB_send("\nEl log de datos está vacio\n");
             }
             (*counter)++;
             return false;
         case 1:
             if (i < getLastTemperatureIndex()) {
-                getLog(i,logText);
+                getLog(i, logText);
                 if (logText) {
                     i++;
                 }
