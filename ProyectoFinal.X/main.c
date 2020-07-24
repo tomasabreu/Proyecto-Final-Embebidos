@@ -76,6 +76,7 @@ void showMenu(void *p_param);
 void sendMessage(void *p_param);
 void sendMessageFinal(void *p_param);
 
+
 TaskHandle_t takeTemperatureHandle;
 
 /*
@@ -88,7 +89,7 @@ int main(void) {
     //    
     xTaskCreate(temperatureSwitch, "Switch temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(getRealTime, "Get real time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(showMenu, "Show Menu", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(showMenu, "Show Menu", configMINIMAL_STACK_SIZE+200, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
     xTaskCreate(SIM808_initModule, "modemIni", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, &modemInitHandle);
     /* Finally start the scheduler. */
@@ -133,27 +134,6 @@ void temperatureSwitch(void *p_param) {
     }
 }
 
-/** 
- * @Function
- *    void sendUsb(uint8_t* text)
- *
- * @Summary
- *   Este se encarga de mandar por usb un texto dado, si este falla un número de veces en este caso 10, se libera.
- *  
- *  
- * @Param: uint8_t* text: texto que se envia por el puerto usb.
- */
-void sendUsb(uint8_t* text) {
-    uint8_t i;
-    for (i = 0; i < 10; i++) {
-        USB_checkStatus();
-        if (USB_getConnectedStatus() && USB_send(text)) {
-            break;
-        }
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-    USB_checkStatus();
-}
 
 /** 
  * @Function
@@ -322,7 +302,7 @@ void sendMessage(void *p_param) {
                     if (!checkThreshold()) {
                         generateMessage(logToSave, textSms);
                         sendUsb(textSms);
-                        xTaskCreate(sendSMS, "sendSMSFinal", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
+                        //xTaskCreate(sendSMS, "sendSMS", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
                     }
                     xSemaphoreGive(c_semGPSIsReady);
                     vTaskDelete(NULL);

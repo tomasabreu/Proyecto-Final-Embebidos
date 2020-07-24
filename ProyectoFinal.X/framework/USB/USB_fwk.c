@@ -24,6 +24,7 @@
 #include "../../mcc_generated_files/usb/usb.h"
 #include "../../mcc_generated_files/pin_manager.h"
 #include <string.h>
+#include "FreeRTOS.h"
 
 
 /* ************************************************************************** */
@@ -156,6 +157,27 @@ bool USB_send( uint8_t *p_src ) {
     }
 }
 
+/** 
+ * @Function
+ *    void sendUsb(uint8_t* text)
+ *
+ * @Summary
+ *   Este se encarga de mandar por usb un texto dado, si este falla un número de veces en este caso 10, se libera.
+ *  
+ *  
+ * @Param: uint8_t* text: texto que se envia por el puerto usb.
+ */
+void sendUsb(uint8_t* text) {
+    uint8_t i;
+    for (i = 0; i < 10; i++) {
+        USB_checkStatus();
+        if (USB_getConnectedStatus() && USB_send(text)) {
+            break;
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+    USB_checkStatus();
+}
 
 
 /* *****************************************************************************

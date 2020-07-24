@@ -41,7 +41,7 @@
     banner.
  */
 #define amountOfSaveTemperatures 200
-static logData savedTemperatures[amountOfSaveTemperatures];
+static logData savedLogs[amountOfSaveTemperatures];
 static int lastTemperatureIndex = 0;
 
 
@@ -82,10 +82,10 @@ static int lastTemperatureIndex = 0;
  */
 bool saveLog(logData log) {
     if (lastTemperatureIndex < amountOfSaveTemperatures) {
-        savedTemperatures[lastTemperatureIndex].id = log.id;
-        savedTemperatures[lastTemperatureIndex].gps = log.gps;    
-        savedTemperatures[lastTemperatureIndex].temperature = log.temperature;    
-        savedTemperatures[lastTemperatureIndex].time = log.time;    
+        savedLogs[lastTemperatureIndex].id = log.id;
+        savedLogs[lastTemperatureIndex].gps = log.gps;    
+        savedLogs[lastTemperatureIndex].temperature = log.temperature;    
+        savedLogs[lastTemperatureIndex].time = log.time;    
         lastTemperatureIndex++;
         return true;
     }
@@ -117,10 +117,12 @@ int getLastTemperatureIndex() {
  *   index -> el index es el lugar donde esta el log de datos en el array con logs de datos
  *   textToSend -> el mensaje para ser enviado.
  */
-void getLog(int index, uint8_t* textToSave){
+logData getLog(int index){
+    logData data;
     if(index < lastTemperatureIndex){
-        generateMessage(savedTemperatures[index],textToSave);
+        data = savedLogs[index];
     }
+    return data;
 }
 
 
@@ -135,7 +137,7 @@ void getLog(int index, uint8_t* textToSave){
  *   textoToSend -> el lugar para guardar el mensaje.
  */
 void generateMessage(logData logToGenerate, uint8_t* textToSave){
-    uint8_t googleMapsLink[64];
+    static uint8_t googleMapsLink[64];
     GPS_generateGoogleMaps(googleMapsLink, logToGenerate.gps);
     sprintf(textToSave, "%d %s %s %.1f\n", logToGenerate.id, ctime(&logToGenerate.time), googleMapsLink, logToGenerate.temperature);
 }

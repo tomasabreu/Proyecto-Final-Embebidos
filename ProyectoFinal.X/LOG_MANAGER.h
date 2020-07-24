@@ -84,7 +84,7 @@ extern "C" {
      */
     bool saveLog(logData log);
     int getlastTemperatureIndex();
-    void getLog(int index, uint8_t* textToSave);
+    logData getLog(int index);
     void generateMessage(logData logToGenerate, uint8_t* textToSave);
 
 

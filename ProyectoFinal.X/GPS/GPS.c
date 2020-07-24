@@ -12,8 +12,8 @@
  */
 /* ************************************************************************** */
 
-/*******************************************************************************/    
-/************************* INCLUDED FILES **************************************/    
+/*******************************************************************************/
+/************************* INCLUDED FILES **************************************/
 /*******************************************************************************/
 #include "GPS.h"
 #include <string.h>
@@ -21,13 +21,13 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-/*******************************************************************************/    
-/************************* LOCAL VARIABLES *************************************/    
-/*******************************************************************************/     
+/*******************************************************************************/
+/************************* LOCAL VARIABLES *************************************/
+/*******************************************************************************/
 
 
-/*******************************************************************************/    
-/************************* INTERFACE FUNCTIONS *********************************/    
+/*******************************************************************************/
+/************************* INTERFACE FUNCTIONS *********************************/
 /*******************************************************************************/
 
 /**
@@ -40,16 +40,15 @@
     @Remarks
         String must start after +CGNSINF: 
  **/
-void GPS_getPosition( GPSPosition_t *p_pos, uint8_t *p_sentence ){
+void GPS_getPosition(GPSPosition_t *p_pos, uint8_t *p_sentence) {
     uint8_t offset;
     uint8_t *ptr;
     uint8_t array[30];
 
-    offset=GPS_RMC_RUN_LEN+GPS_RMC_COMMA_LEN+GPS_RMC_FIX_LEN+GPS_RMC_COMMA_LEN+GPS_RMC_UTC_LEN+GPS_RMC_COMMA_LEN;
-    sscanf((p_sentence+offset), "%lf,%lf", &p_pos->latitude,&p_pos->longitude);
-//    strcpy(array,p_sentence);
+    offset = GPS_RMC_RUN_LEN + GPS_RMC_COMMA_LEN + GPS_RMC_FIX_LEN + GPS_RMC_COMMA_LEN + GPS_RMC_UTC_LEN + GPS_RMC_COMMA_LEN;
+    sscanf((p_sentence + offset), "%lf,%lf", &p_pos->latitude, &p_pos->longitude);
+    //    strcpy(array,p_sentence);
 }
-
 
 /**
     @Function
@@ -61,39 +60,39 @@ void GPS_getPosition( GPSPosition_t *p_pos, uint8_t *p_sentence ){
     @Remarks
         String must start after +CGNSINF: 
  **/
-void GPS_getUTC( struct tm *p_newtime, uint8_t *p_sentence ){
+void GPS_getUTC(struct tm *p_newtime, uint8_t *p_sentence) {
     uint8_t offset;
     uint8_t temp_str[5];
 
-    offset=GPS_RMC_RUN_LEN+GPS_RMC_COMMA_LEN+GPS_RMC_FIX_LEN+GPS_RMC_COMMA_LEN;
+    offset = GPS_RMC_RUN_LEN + GPS_RMC_COMMA_LEN + GPS_RMC_FIX_LEN + GPS_RMC_COMMA_LEN;
     // Copy Year YYYY
-    memset( temp_str, 0, 5 );
-    strncpy( temp_str, (p_sentence+offset), 4 );
-    p_newtime->tm_year=atoi( temp_str )-1900;
-    offset+=4;
+    memset(temp_str, 0, 5);
+    strncpy(temp_str, (p_sentence + offset), 4);
+    p_newtime->tm_year = atoi(temp_str) - 1900;
+    offset += 4;
     // Copy Month MM
-    memset( temp_str, 0, 5 );
-    strncpy( temp_str, (p_sentence+offset), 2 );
-    p_newtime->tm_mon = atoi(temp_str)-1;
-    offset+=2;
+    memset(temp_str, 0, 5);
+    strncpy(temp_str, (p_sentence + offset), 2);
+    p_newtime->tm_mon = atoi(temp_str) - 1;
+    offset += 2;
     // Copy Day DD
-    memset( temp_str, 0, 5 );
-    strncpy( temp_str, (p_sentence+offset), 2 );
+    memset(temp_str, 0, 5);
+    strncpy(temp_str, (p_sentence + offset), 2);
     p_newtime->tm_mday = atoi(temp_str);
-    offset+=2;
+    offset += 2;
     // Copy Hour HH
-    memset( temp_str, 0, 5 );
-    strncpy( temp_str, (p_sentence+offset), 2 );
+    memset(temp_str, 0, 5);
+    strncpy(temp_str, (p_sentence + offset), 2);
     p_newtime->tm_hour = atoi(temp_str);
-    offset+=2;
+    offset += 2;
     // Copy Minutes MM
-    memset( temp_str, 0, 5 );
-    strncpy( temp_str, (p_sentence+offset), 2 );
+    memset(temp_str, 0, 5);
+    strncpy(temp_str, (p_sentence + offset), 2);
     p_newtime->tm_min = atoi(temp_str);
-    offset+=2;
+    offset += 2;
     // Copy Seconds SS
-    memset( temp_str, 0, 5 );
-    strncpy( temp_str, (p_sentence+offset), 2 );
+    memset(temp_str, 0, 5);
+    strncpy(temp_str, (p_sentence + offset), 2);
     p_newtime->tm_sec = atoi(temp_str);
 }
 
@@ -107,29 +106,29 @@ void GPS_getUTC( struct tm *p_newtime, uint8_t *p_sentence ){
     @Remarks
         None
  **/
-double GPS_getGroundDistance( GPSPosition_t *a, GPSPosition_t *b ){
+double GPS_getGroundDistance(GPSPosition_t *a, GPSPosition_t *b) {
     double angle;
     double lat_a, lon_a, lat_b, lon_b;
 
-    lat_a=a->latitude*M_PI/180;
-    lon_a=a->longitude*M_PI/180;
-    lat_b=b->latitude*M_PI/180;
-    lon_b=b->longitude*M_PI/180;
+    lat_a = a->latitude * M_PI / 180;
+    lon_a = a->longitude * M_PI / 180;
+    lat_b = b->latitude * M_PI / 180;
+    lon_b = b->longitude * M_PI / 180;
 
-	angle = sqrt(cos(lat_a)*cos(lat_b)*pow(sin((lon_a - lon_b)/2), 2) + pow(sin((lat_a - lat_b)/2), 2));
-	angle = 2*asin(angle);
+    angle = sqrt(cos(lat_a) * cos(lat_b) * pow(sin((lon_a - lon_b) / 2), 2) + pow(sin((lat_a - lat_b) / 2), 2));
+    angle = 2 * asin(angle);
 
-	return angle * GPS_EARTH_RADIUS;
+    return angle * GPS_EARTH_RADIUS;
 }
 
-void GPS_generateGoogleMaps( uint8_t *p_linkDest, GPSPosition_t p_gpsData ){
-    uint8_t latitude[128];
-    uint8_t longitude[128];
-
-    strcpy( p_linkDest, "http://maps.google.com/?q=" );
-    sprintf( latitude,"%f", p_gpsData.latitude );
-    strcat( p_linkDest, latitude );
-    strcat( p_linkDest,"," );
-    sprintf( longitude,"%f", p_gpsData.longitude );
-    strcat( p_linkDest,longitude );
+void GPS_generateGoogleMaps(uint8_t *p_linkDest, GPSPosition_t p_gpsData) {
+    //    uint8_t latitude[128];
+    //    uint8_t longitude[128];
+    sprintf(p_linkDest, "http://maps.google.com/?q=%f,%f", p_gpsData.latitude, p_gpsData.longitude);
+    //    strcpy( p_linkDest, "http://maps.google.com/?q=" );
+    //    sprintf( latitude,"%f", p_gpsData.latitude );
+    //    strcat( p_linkDest, latitude );
+    //    strcat( p_linkDest,"," );
+    //    sprintf( longitude,"%f", p_gpsData.longitude );
+    //    strcat( p_linkDest,longitude );
 }

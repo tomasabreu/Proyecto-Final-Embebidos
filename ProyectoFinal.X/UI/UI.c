@@ -32,6 +32,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include "FreeRTOS.h"
+#include "task.h"
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -60,6 +62,7 @@
   @Remarks
     Any additional remarks
  */
+void sendLogs(void *p_param);
 const uint8_t ui_welcomeText[] = "Bienvenido al Proyecto de Sistemas Embebidos\nPor favor presione una tecla para continuar...\n";
 const uint8_t ui_optionsText2[] = "1) Cambiar ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono receptor de advertencias\n4) Cambiar los colores de las medidas de temperatura\n5) Mostrar el log de datos\n";
 const uint8_t ui_optionsText1[] = "\nIndique la opción deseada:\nPara tomar la temperatura presione el botón s2 de la placa\n";
@@ -193,8 +196,6 @@ bool UI_waitForInput(uint8_t *p_dest) {
     return false;
 }
 
-
-
 /** 
  * @Function
  *    bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray)
@@ -237,7 +238,6 @@ bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray) {
     }
 }
 
-
 /** 
  * @Function
  *    bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1)
@@ -267,12 +267,12 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
                 (*counter)++;
                 return false;
             }
-        case 2: 
-            if(dataArray1[2]==','){
-                dataArray1[2]='.';
+        case 2:
+            if (dataArray1[2] == ',') {
+                dataArray1[2] = '.';
             }
             sscanf(dataArray1, "%f", &umbral);
-            if (umbral<=42.0 && umbral >=32.0) {
+            if (umbral <= 42.0 && umbral >= 32.0) {
                 setThreshold(umbral);
                 USB_send("\nSe cambió exitosamente la temperatura umbral\n");
             } else {
@@ -282,7 +282,6 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
             return true;
     }
 }
-
 
 /** 
  * @Function
@@ -325,7 +324,6 @@ bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
             return true;
     }
 }
-
 
 /** 
  * @Function
@@ -375,7 +373,6 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
     }
 }
 
-
 /** 
  * @Function
  *    bool switchShowAllLog(int* counter)
@@ -388,31 +385,40 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
  *  
  */
 bool switchShowAllLog(int* counter) {
-    static int i = 0;
-    static uint8_t logText[128];
+    static bool canRun = false;
     switch (*counter) {
         case 0:
-            if (i < getLastTemperatureIndex()) {
+            if (getLastTemperatureIndex()>0) {
                 USB_send("\nEl log guardado hasta el momento es el siguiente:\n");
             } else {
                 USB_send("\nEl log de datos está vacio\n");
+                return true;
             }
             (*counter)++;
             return false;
         case 1:
-            if (i < getLastTemperatureIndex()) {
-                getLog(i, logText);
-                if (logText) {
-                    i++;
-                }
-                return false;
+            xTaskCreate(sendLogs, "send Log", configMINIMAL_STACK_SIZE+200, &canRun, tskIDLE_PRIORITY + 2, NULL);
+            while(!canRun){
+                vTaskDelay(pdMS_TO_TICKS(100));
             }
-            i = 0;
             *counter = 0;
+            canRun = false;
             return true;
     }
 }
-
+void sendLogs(void *p_param){
+    int i;
+    logData logToGenerate;
+    uint8_t text[128];
+    bool* canRun = (bool*) p_param;
+    for(i=0;i<getLastTemperatureIndex();i++){
+        logToGenerate = getLog(i);
+        generateMessage(logToGenerate,text);
+        sendUsb(text);
+    }
+    *canRun = true;
+    vTaskDelete(NULL);
+}
 bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, double p_max, double p_min) {
     double intValue;
     uint32_t i;

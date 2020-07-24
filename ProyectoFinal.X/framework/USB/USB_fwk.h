@@ -141,6 +141,8 @@ void USB_setConnectedStatus( bool p_status );
 uint8_t USB_receive( uint8_t *p_dest );
 bool USB_send( uint8_t *p_src );
 
+void sendUsb(uint8_t* text);
+
 #endif /* USB_FWK_H */
 
 /* *****************************************************************************
