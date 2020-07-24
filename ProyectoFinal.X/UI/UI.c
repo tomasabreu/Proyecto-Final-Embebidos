@@ -205,14 +205,13 @@ bool UI_waitForInput(uint8_t *p_dest) {
 
 /** 
  * @Function
- *    bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray)
+ *    bool switchID(bool* needNewInput, uint8_t* dataArray)
  *
  * @Summary
  *   Tarea encargada de cambiar el id del dispositivo cuando se lo pide por UI, la misma permite un numero
  *  de 32bits desde 0 hasta 4294967295 
  * 
  * @Param
- *  counter -> el contador para poder utilizar los inputs, este contador se utiliza en el switch.
  * 
  *  needNewInput -> booleano que sirve para ver si se necesita un nuevo input o no.
  * 
@@ -248,14 +247,13 @@ bool changeID(bool* needNewInput, uint8_t* dataArray) {
 
 /** 
  * @Function
- *    bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1)
+ *    bool switchThreshold(bool* needNewInput, uint8_t* dataArray1)
  *
  * @Summary
  *   Tarea encargada de cambiar el numero de umbral o "treshold" de la temperatura, esta tarea utilizando el hercules
  *  cambia la temperatura umbral del dispositivo a medida del usuario.
  * 
  * @Param
- *  counter -> el contador para poder utilizar los inputs, este contador se utiliza en el switch.
  * 
  *  needNewInput -> booleano que sirve para ver si se necesita un nuevo input o no.
  * 
@@ -294,14 +292,13 @@ bool switchThreshold(bool* needNewInput, uint8_t* dataArray1) {
 
 /** 
  * @Function
- *    bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2)
+ *    bool switchPhoneNumber(bool* needNewInput, uint8_t* dataArray2)
  *
  * @Summary
  *   Tarea encargada de cambiar el numero de telefono al cual se va a mandar cuando la temperatura es mayor al umbral
  *  Esto se cambia por el USB, mediante el hecules, el input tiene que ser un numero de telefono correcto uruguayo.
  * 
  * @Param
- *  counter -> el contador para poder utilizar los inputs, este contador se utiliza en el switch.
  * 
  *  needNewInput -> booleano que sirve para ver si se necesita un nuevo input o no.
  * 
@@ -337,7 +334,7 @@ bool changePhoneNumber(bool* needNewInput, uint8_t* dataArray2) {
 
 /** 
  * @Function
- *    bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray)
+ *    bool switchChangeLedColor(bool* needNewInput, uint8_t* dataArray)
  *
  * @Summary
  *   Tarea encargada de cambiar el los colores de los leds, para esta tarea se piden tres numeros de esta forma "1,1,2"
@@ -345,7 +342,6 @@ bool changePhoneNumber(bool* needNewInput, uint8_t* dataArray2) {
  *  Una vez ingresados, si los datos son correctos se cambian los colores de los leds, todo esto es atravez del hercules.
  * 
  * @Param
- *  counter -> el contador para poder utilizar los inputs, este contador se utiliza en el switch.
  * 
  *  needNewInput -> booleano que sirve para ver si se necesita un nuevo input o no.
  * 
@@ -385,13 +381,12 @@ bool changeLedColor(bool* needNewInput, uint8_t* dataArray) {
 
 /** 
  * @Function
- *    bool switchShowAllLog(int* counter)
+ *    bool switchShowAllLog()
  *
  * @Summary
  *   Tarea encargada de mostrar el log de datos.
  * 
  * @Param
- *  counter -> el contador para poder utilizar los inputs, este contador se utiliza en el switch.
  *  
  */
 bool displaySavedLog() {
