@@ -135,7 +135,6 @@ logData getLog(int index){
  * @Param:
  *   logToGenerate -> este es el log que quiere ser generado.
  *   textoToSend -> el lugar para guardar el mensaje.
- *   withId -> si es verdadero coloca el id del dispositivo y sino el id del log.
  *   withID -> algunos mensajes pueden necesitar que se envíe con ID del dispositivo o ID del log, este bool cuando verdadero
  *             define que se debe envíar el mensaje con el ID del dispotivo. Sino se manda con el ID del log.
  */
