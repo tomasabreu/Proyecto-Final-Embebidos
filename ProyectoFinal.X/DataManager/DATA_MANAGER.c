@@ -119,7 +119,7 @@ uint32_t getPhone() {
  *    void setLedColor(uint8_t* arrayColors)
  *
  * @Summary
- *   Esta funcion se encarga de setear los colores para la medida de temperatura.
+ *  Esta funcion se encarga de setear los colores para la medida de temperatura.
  *  En esto se setea el color para cuando se esta midiendo la temperatura,
  *  el color para cuando la temperatura es mayor al umbral y
  *  el colo para cuando la temperatura es menor al umbral.
@@ -154,7 +154,7 @@ void setLedColor(uint8_t* arrayColors) {
  *    enum rgb_colors* getLedColor()
  *
  * @Summary
- *   Esta funcion da el color de los leds.
+ *   Esta funcion da el array de colores de los leds.
  *  
  */
 enum rgb_colors* getLedColor() {

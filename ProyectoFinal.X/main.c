@@ -74,7 +74,7 @@ void temperatureSwitch(void *p_param);
 void getRealTime(void *p_param);
 void showMenu(void *p_param);
 void sendMessage(void *p_param);
-void sendMessageFinal(void *p_param);
+void sendSMS(void *p_param);
 
 
 TaskHandle_t takeTemperatureHandle;
