@@ -410,6 +410,15 @@ bool displaySavedLog() {
     }
 }
 
+
+/**
+ * @Function
+ *    void sendLogs(void *p_param)
+ * 
+ * @Summary
+ *    Se encarga de generar la tarea "sendSavedData"
+ * 
+ */
 void sendLogs(void *p_param) {
     int i;
     logData logToGenerate;
@@ -424,6 +433,15 @@ void sendLogs(void *p_param) {
     vTaskDelete(NULL);
 }
 
+
+/**
+ * @Function
+ *    bool displaySavedData()
+ * 
+ * @Summary
+ *    Se encarga de generar la tarea "sendSavedData"
+ * 
+ */
 bool displaySavedData() {
     SemaphoreHandle_t xSemaphore = xSemaphoreCreateBinary();
     xTaskCreate(sendSavedData, "Send Data", configMINIMAL_STACK_SIZE + 200, &xSemaphore, tskIDLE_PRIORITY, NULL);
@@ -431,6 +449,16 @@ bool displaySavedData() {
     return true;
 }
 
+
+/**
+ * @Function
+ *    void sendSavedData(void *p_param)
+ * 
+ * @Summary
+ *    Envia por USB la informacion contenida de toda la palca. 
+ *  Esto incluye, telefono registrado, ID del dispositivo, umbral y colores del led
+ * 
+ */
 void sendSavedData(void *p_param) {
     SemaphoreHandle_t* xSemaphore = (SemaphoreHandle_t*) p_param;
     static uint8_t text[200];
