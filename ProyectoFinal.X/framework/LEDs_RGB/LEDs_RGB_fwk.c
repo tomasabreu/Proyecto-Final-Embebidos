@@ -155,6 +155,17 @@ void RGB_setLedColor( uint8_t p_index,enum rgb_colors p_color ){
     }
 }
 
+/**
+ * @Function 
+ *    void RGB_setAllColor(int num_Led, enum rgb_colors p_color)
+ * 
+ * @Summary
+ *    Cambia todos los leds al color indicado por parameto.
+ * 
+ * @Param:
+ *   @param num_Led
+ *   @param p_color
+ */
 void RGB_setAllColor(int num_Led, enum rgb_colors p_color){
     int i;
     for(i = 0; i < num_Led; i++){RGB_setLedColor(i, p_color);}

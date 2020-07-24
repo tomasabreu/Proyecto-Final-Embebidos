@@ -146,7 +146,7 @@ void UI_showMenu(void) {
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && switchID(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && changeID(&counter, &needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
@@ -162,7 +162,7 @@ void UI_showMenu(void) {
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && switchPhoneNumber(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && changePhoneNumber(&counter, &needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
@@ -170,12 +170,12 @@ void UI_showMenu(void) {
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && switchChangeLedColor(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && changeLedColor(&counter, &needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
             case( UI_MENU_STATE_SHOW_ALL_LOGS):
-                if (switchShowAllLog(&counter)) {
+                if (displaySavedLog(&counter)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
@@ -212,7 +212,7 @@ bool UI_waitForInput(uint8_t *p_dest) {
  *  dataArray -> el input que se hizo.
  *  
  */
-bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray) {
+bool changeID(int* counter, bool* needNewInput, uint8_t* dataArray) {
     uint32_t id;
     switch (*counter) {
         case 0:
@@ -299,7 +299,7 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
  *  dataArray -> el input que se hizo.
  *  
  */
-bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
+bool changePhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
     uint32_t newPhone;
     switch (*counter) {
         case 0:
@@ -342,7 +342,7 @@ bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
  *  dataArray -> el input que se hizo.
  *  
  */
-bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) {
+bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) {
 
     int firstColor;
     int secondColor;
@@ -384,7 +384,7 @@ bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) 
  *  counter -> el contador para poder utilizar los inputs, este contador se utiliza en el switch.
  *  
  */
-bool switchShowAllLog(int* counter) {
+bool displaySavedLog(int* counter) {
     static bool canRun = false;
     switch (*counter) {
         case 0:

@@ -181,13 +181,13 @@ extern "C" {
     
     bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray);
     
-    bool switchID(int* counter, bool* needNewInput, uint8_t* dataArray);
+    bool changeID(int* counter, bool* needNewInput, uint8_t* dataArray);
     
-    bool switchPhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray);
+    bool changePhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray);
     
-    bool switchChangeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray);
+    bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray);
     
-    bool switchShowAllLog(int* counter);
+    bool displaySavedLog(int* counter);
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
