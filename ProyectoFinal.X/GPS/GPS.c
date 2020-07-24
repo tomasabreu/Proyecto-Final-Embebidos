@@ -122,13 +122,5 @@ double GPS_getGroundDistance(GPSPosition_t *a, GPSPosition_t *b) {
 }
 
 void GPS_generateGoogleMaps(uint8_t *p_linkDest, GPSPosition_t p_gpsData) {
-    //    uint8_t latitude[128];
-    //    uint8_t longitude[128];
     sprintf(p_linkDest, "http://maps.google.com/?q=%f,%f", p_gpsData.latitude, p_gpsData.longitude);
-    //    strcpy( p_linkDest, "http://maps.google.com/?q=" );
-    //    sprintf( latitude,"%f", p_gpsData.latitude );
-    //    strcat( p_linkDest, latitude );
-    //    strcat( p_linkDest,"," );
-    //    sprintf( longitude,"%f", p_gpsData.longitude );
-    //    strcat( p_linkDest,longitude );
 }

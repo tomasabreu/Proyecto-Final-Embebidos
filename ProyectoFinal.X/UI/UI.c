@@ -34,7 +34,8 @@
 #include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
-
+#include "semphr.h"
+#include "../framework/LEDs_RGB/LEDs_RGB_fwk.h"
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: File Scope or Global Data                                         */
@@ -63,9 +64,10 @@
     Any additional remarks
  */
 void sendLogs(void *p_param);
+void sendSavedData(void *p_param);
 const uint8_t ui_welcomeText[] = "Bienvenido al Proyecto de Sistemas Embebidos\nPor favor presione una tecla para continuar...\n";
-const uint8_t ui_optionsText2[] = "1) Cambiar ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n3) Cambiar el telefono receptor de advertencias\n4) Cambiar los colores de las medidas de temperatura\n5) Mostrar el log de datos\n";
-const uint8_t ui_optionsText1[] = "\nIndique la opción deseada:\nPara tomar la temperatura presione el botón s2 de la placa\n";
+const uint8_t ui_optionsText1[] = "\nPara tomar la temperatura presione el botón s2 de la placa\nIndique la opción deseada:\n1) Cambiar ID del dispositivo \n2) Cambiar el umbral de temperatura usado\n";
+const uint8_t ui_optionsText2[] = "3) Cambiar el telefono receptor de advertencias\n4) Cambiar los colores de las medidas de temperatura\n5) Mostrar el log de datos\n6) Mostrar datos configurados del dispositivo\n";
 /* ************************************************************************** */
 /* ************************************************************************** */
 // Section: Local Functions                                                   */
@@ -136,7 +138,7 @@ void UI_showMenu(void) {
                 }
                 break;
             case( UI_MENU_STATE_OPTIONS_CHECK):
-                if ((UI_checkValidOption(dataArray1, UI_OPTION_NUM, 5, 1))) {
+                if ((UI_checkValidOption(dataArray1, UI_OPTION_NUM, 6, 1))) {
                     menuState = UI_MENU_STATE_OPTIONS_CHECK + atoi(dataArray1);
                 } else {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
@@ -146,7 +148,7 @@ void UI_showMenu(void) {
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && changeID(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && changeID(&needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
@@ -154,7 +156,7 @@ void UI_showMenu(void) {
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && switchThreshold(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && switchThreshold(&needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
@@ -162,7 +164,7 @@ void UI_showMenu(void) {
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && changePhoneNumber(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && changePhoneNumber(&needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
@@ -170,12 +172,17 @@ void UI_showMenu(void) {
                 if (needNewInput1 && UI_waitForInput(dataArray1)) {
                     needNewInput1 = false;
                 }
-                if (!needNewInput1 && changeLedColor(&counter, &needNewInput1, dataArray1)) {
+                if (!needNewInput1 && changeLedColor(&needNewInput1, dataArray1)) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
             case( UI_MENU_STATE_SHOW_ALL_LOGS):
-                if (displaySavedLog(&counter)) {
+                if (displaySavedLog()) {
+                    menuState = UI_MENU_STATE_OPTIONS_SHOW;
+                }
+                break;
+            case( UI_MENU_STATE_SHOW_DATA):
+                if (displaySavedData()) {
                     menuState = UI_MENU_STATE_OPTIONS_SHOW;
                 }
                 break;
@@ -212,17 +219,18 @@ bool UI_waitForInput(uint8_t *p_dest) {
  *  dataArray -> el input que se hizo.
  *  
  */
-bool changeID(int* counter, bool* needNewInput, uint8_t* dataArray) {
-    uint32_t id;
-    switch (*counter) {
+bool changeID(bool* needNewInput, uint8_t* dataArray) {
+    static uint32_t id;
+    static int counter = 0;
+    switch (counter) {
         case 0:
             USB_send("\nIngrese el ID del dispositivo, debe ser un número entero de 32 bits entre 0 y 4294967295\n");
-            (*counter)++;
+            counter++;
             return false;
         case 1:
             if (!(*needNewInput)) {
                 *needNewInput = true;
-                (*counter)++;
+                counter++;
                 return false;
             }
         case 2:
@@ -233,7 +241,7 @@ bool changeID(int* counter, bool* needNewInput, uint8_t* dataArray) {
             } else {
                 USB_send("\nPor favor ingrese un valor válido de 32 bits\n");
             }
-            *counter = 0;
+            counter = 0;
             return true;
     }
 }
@@ -254,17 +262,18 @@ bool changeID(int* counter, bool* needNewInput, uint8_t* dataArray) {
  *  dataArray -> el input que se hizo.
  *  
  */
-bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
-    float umbral;
-    switch (*counter) {
+bool switchThreshold(bool* needNewInput, uint8_t* dataArray1) {
+    static float umbral;
+    static int counter = 0;
+    switch (counter) {
         case 0:
             USB_send("\nIngrese la temperatura umbral nueva\n");
-            (*counter)++;
+            counter++;
             return false;
         case 1:
             if (!(*needNewInput)) {
                 *needNewInput = true;
-                (*counter)++;
+                counter++;
                 return false;
             }
         case 2:
@@ -278,7 +287,7 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
             } else {
                 USB_send("\nPor favor ingrese un valor válido entre 32 y 42 grados\n");
             }
-            *counter = 0;
+            counter = 0;
             return true;
     }
 }
@@ -299,17 +308,18 @@ bool switchThreshold(int* counter, bool* needNewInput, uint8_t* dataArray1) {
  *  dataArray -> el input que se hizo.
  *  
  */
-bool changePhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
-    uint32_t newPhone;
-    switch (*counter) {
+bool changePhoneNumber(bool* needNewInput, uint8_t* dataArray2) {
+    static uint32_t newPhone;
+    static int counter = 0;
+    switch (counter) {
         case 0:
             USB_send("\nIngrese un nuevo número de teléfono\n");
-            (*counter)++;
+            counter++;
             return false;
         case 1:
             if (!(*needNewInput)) {
                 *needNewInput = true;
-                (*counter)++;
+                counter++;
                 return false;
             }
         case 2:
@@ -320,7 +330,7 @@ bool changePhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
             } else {
                 USB_send("\nPor favor ingrese un número válido\n");
             }
-            *counter = 0;
+            counter = 0;
             return true;
     }
 }
@@ -342,21 +352,21 @@ bool changePhoneNumber(int* counter, bool* needNewInput, uint8_t* dataArray2) {
  *  dataArray -> el input que se hizo.
  *  
  */
-bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) {
+bool changeLedColor(bool* needNewInput, uint8_t* dataArray) {
+    static int counter = 0;
+    static int firstColor;
+    static int secondColor;
+    static int thirdColor;
 
-    int firstColor;
-    int secondColor;
-    int thirdColor;
-
-    switch (*counter) {
+    switch (counter) {
         case 0:
             USB_send("\nIngrese números desde 0 a 3.\n0 = Blanco\n1 = Rojo\n2 = Verde\n3 = Azul\nEl formato es \"1,2,3\"\nEl primer número es el color parpadeante al medir la temperatura\nEl segundo se presenta cuando la temperatura es menor al umbral\nY tercero cuando es mayor.\n");
-            (*counter)++;
+            counter++;
             return false;
         case 1:
             if (!(*needNewInput)) {
                 *needNewInput = true;
-                (*counter)++;
+                counter++;
                 return false;
             }
         case 2:
@@ -368,7 +378,7 @@ bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) {
             } else {
                 USB_send("\nLos datos ingresados no respetan el formato, por favor ingrese los números de los colores correspondientes siendo estos 0,1,2,3\n");
             }
-            *counter = 0;
+            counter = 0;
             return true;
     }
 }
@@ -384,41 +394,72 @@ bool changeLedColor(int* counter, bool* needNewInput, uint8_t* dataArray) {
  *  counter -> el contador para poder utilizar los inputs, este contador se utiliza en el switch.
  *  
  */
-bool displaySavedLog(int* counter) {
-    static bool canRun = false;
-    switch (*counter) {
+bool displaySavedLog() {
+    static int counter = 0;
+    SemaphoreHandle_t xSemaphore = xSemaphoreCreateBinary();
+    switch (counter) {
         case 0:
-            if (getLastTemperatureIndex()>0) {
+            if (getLastTemperatureIndex() > 0) {
                 USB_send("\nEl log guardado hasta el momento es el siguiente:\n");
             } else {
                 USB_send("\nEl log de datos está vacio\n");
                 return true;
             }
-            (*counter)++;
+            counter++;
             return false;
         case 1:
-            xTaskCreate(sendLogs, "send Log", configMINIMAL_STACK_SIZE+200, &canRun, tskIDLE_PRIORITY + 2, NULL);
-            while(!canRun){
-                vTaskDelay(pdMS_TO_TICKS(100));
-            }
-            *counter = 0;
-            canRun = false;
+            xTaskCreate(sendLogs, "send Log", configMINIMAL_STACK_SIZE + 200, &xSemaphore, tskIDLE_PRIORITY, NULL);
+            xSemaphoreTake(xSemaphore, portMAX_DELAY);
+            counter = 0;
             return true;
     }
 }
 
-
-void sendLogs(void *p_param){
+void sendLogs(void *p_param) {
     int i;
     logData logToGenerate;
     uint8_t text[128];
-    bool* canRun = (bool*) p_param;
-    for(i=0;i<getLastTemperatureIndex();i++){
+    SemaphoreHandle_t* xSemaphore = (SemaphoreHandle_t*) p_param;
+    for (i = 0; i < getLastTemperatureIndex(); i++) {
         logToGenerate = getLog(i);
-        generateMessage(logToGenerate,text);
+        generateMessage(logToGenerate, text, false);
         sendUsb(text);
     }
-    *canRun = true;
+    xSemaphoreGive(*xSemaphore);
+    vTaskDelete(NULL);
+}
+
+bool displaySavedData() {
+    SemaphoreHandle_t xSemaphore = xSemaphoreCreateBinary();
+    xTaskCreate(sendSavedData, "Send Data", configMINIMAL_STACK_SIZE + 200, &xSemaphore, tskIDLE_PRIORITY, NULL);
+    xSemaphoreTake(xSemaphore, portMAX_DELAY);
+    return true;
+}
+
+void sendSavedData(void *p_param) {
+    SemaphoreHandle_t* xSemaphore = (SemaphoreHandle_t*) p_param;
+    static uint8_t text[200];
+    static uint8_t color[3][10];
+    static int i;
+    for (i = 0; i < 3; i++) {
+        switch (getLedColor()[i]) {
+            case RGB_WHITE:
+                strcpy(color[i],"Blanco");
+                break;
+            case RGB_RED:
+                strcpy(color[i],"Rojo");
+                break;
+            case RGB_GREEN:
+                strcpy(color[i],"Verde");
+                break;
+            case RGB_BLUE:
+                strcpy(color[i],"Azul");
+                break;
+        }
+    }
+    sprintf(text, "\nLos datos guardados son:\nTelefono = 0%u\nID = %u\nUmbral = %.1f\nColores = %s, %s, %s\n", getPhone(), getID(), getThreshold(),color[0],color[1],color[2]);
+    sendUsb(text);
+    xSemaphoreGive(*xSemaphore);
     vTaskDelete(NULL);
 }
 

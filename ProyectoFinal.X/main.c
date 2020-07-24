@@ -89,7 +89,7 @@ int main(void) {
     //    
     xTaskCreate(temperatureSwitch, "Switch temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(getRealTime, "Get real time", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(showMenu, "Show Menu", configMINIMAL_STACK_SIZE+200, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(showMenu, "Show Menu", configMINIMAL_STACK_SIZE+200, NULL, tskIDLE_PRIORITY, NULL);
     xTaskCreate(SIM808_taskCheck, "modemTask", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
     xTaskCreate(SIM808_initModule, "modemIni", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, &modemInitHandle);
     /* Finally start the scheduler. */
@@ -195,7 +195,6 @@ void takeTemperature(void *p_param) {
 void showMenu(void *p_param) {
     for (;;) {
         UI_showMenu();
-        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -300,7 +299,7 @@ void sendMessage(void *p_param) {
                         sendUsb("No se pudo guardar la temperatura, memoria llena.\n");
                     }
                     if (!checkThreshold()) {
-                        generateMessage(logToSave, textSms);
+                        generateMessage(logToSave, textSms, true);
                         sendUsb(textSms);
 //                        xTaskCreate(sendSMS, "Send SMS", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
                     }

@@ -66,7 +66,7 @@ extern "C" {
      */
 
     typedef struct {
-        uint32_t id;
+        uint8_t id;
         time_t time;
         GPSPosition_t gps;
         float temperature;
@@ -85,7 +85,7 @@ extern "C" {
     bool saveLog(logData log);
     int getlastTemperatureIndex();
     logData getLog(int index);
-    void generateMessage(logData logToGenerate, uint8_t* textToSave);
+    void generateMessage(logData logToGenerate, uint8_t* textToSave, bool withID);
 
 
     /* Provide C++ Compatibility */
