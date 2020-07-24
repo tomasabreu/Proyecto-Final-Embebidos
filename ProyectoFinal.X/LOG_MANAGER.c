@@ -96,7 +96,7 @@ bool saveLog(logData log) {
 
 /** 
  * @Function
- *    int getLastTemperatureIndex()
+ *   int getLastTemperatureIndex()
  *
  * @Summary
  *   Esta funcion se encarga dar el tamaño del log de datos hasta el momento.
@@ -110,7 +110,7 @@ int getLastTemperatureIndex() {
 
 /** 
  * @Function
- *    void getLog(int index)
+ *   void getLog(int index)
  *
  * @Summary
  *   Esta funcion se encarga dar el log de datos.
@@ -136,6 +136,8 @@ logData getLog(int index){
  *   logToGenerate -> este es el log que quiere ser generado.
  *   textoToSend -> el lugar para guardar el mensaje.
  *   withId -> si es verdadero coloca el id del dispositivo y sino el id del log.
+ *   withID -> algunos mensajes pueden necesitar que se envíe con ID del dispositivo o ID del log, este bool cuando verdadero
+ *             define que se debe envíar el mensaje con el ID del dispotivo. Sino se manda con el ID del log.
  */
 void generateMessage(logData logToGenerate, uint8_t* textToSave, bool withID){
     static uint8_t googleMapsLink[64];
