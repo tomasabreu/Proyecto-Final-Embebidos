@@ -406,6 +406,8 @@ bool displaySavedLog(int* counter) {
             return true;
     }
 }
+
+
 void sendLogs(void *p_param){
     int i;
     logData logToGenerate;
@@ -419,6 +421,20 @@ void sendLogs(void *p_param){
     *canRun = true;
     vTaskDelete(NULL);
 }
+
+/**
+ * @Function
+ *    bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, double p_max, double p_min)
+ * 
+ * @Summary
+ *    Checkea si lo recibido por el usuario en la interfaz es un input valido.
+ * 
+ * @param p_src
+ * @param p_type
+ * @param p_max
+ * @param p_min
+ * @return bool
+ */
 bool UI_checkValidOption(uint8_t *p_src, ui_options_t p_type, double p_max, double p_min) {
     double intValue;
     uint32_t i;

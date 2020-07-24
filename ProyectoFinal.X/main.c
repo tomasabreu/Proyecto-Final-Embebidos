@@ -262,7 +262,7 @@ void sendSMS(void *p_param) {
             vTaskDelete(NULL);
         }
     }
-    sendUsb("No se pudo enviar el sms, podria no estar configurado\n");
+    sendUsb("No se pudo enviar el sms, puede que no esté configurado\n");
     vTaskDelete(NULL);
 }
 
@@ -302,7 +302,7 @@ void sendMessage(void *p_param) {
                     if (!checkThreshold()) {
                         generateMessage(logToSave, textSms);
                         sendUsb(textSms);
-                        //xTaskCreate(sendSMS, "sendSMS", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
+//                        xTaskCreate(sendSMS, "Send SMS", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
                     }
                     xSemaphoreGive(c_semGPSIsReady);
                     vTaskDelete(NULL);
