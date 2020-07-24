@@ -371,7 +371,7 @@ bool changeLedColor(bool* needNewInput, uint8_t* dataArray) {
             }
         case 2:
             sscanf(dataArray, "%d,%d,%d", &firstColor, &secondColor, &thirdColor);
-            if (firstColor >= 0 && firstColor < 4 && secondColor >= 0 && secondColor < 4 && thirdColor >= 0 && thirdColor < 4) {
+            if (strlen(dataArray) == 5 && firstColor >= 0 && firstColor < 4 && secondColor >= 0 && secondColor < 4 && thirdColor >= 0 && thirdColor < 4) {
                 uint8_t arrayColors[3] = {firstColor, secondColor, thirdColor};
                 USB_send("\nSe cambió exitosamente los colores\n");
                 setLedColor(arrayColors);

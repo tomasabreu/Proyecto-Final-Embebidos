@@ -301,7 +301,7 @@ void sendMessage(void *p_param) {
                     if (!checkThreshold()) {
                         generateMessage(logToSave, textSms, true);
                         sendUsb(textSms);
-//                        xTaskCreate(sendSMS, "Send SMS", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
+                        xTaskCreate(sendSMS, "Send SMS", configMINIMAL_STACK_SIZE, textSms, tskIDLE_PRIORITY + 1, NULL);
                     }
                     xSemaphoreGive(c_semGPSIsReady);
                     vTaskDelete(NULL);
