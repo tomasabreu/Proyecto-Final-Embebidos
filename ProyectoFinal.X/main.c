@@ -121,7 +121,7 @@ void temperatureSwitch(void *p_param) {
         if (BTN1_GetValue()) {
             RGB_setAllColor(8, RGB_BLACK);
             RGB_showLeds(8);
-            if (takeTemperatureHandle != NULL && eTaskGetState(takeTemperatureHandle) != eDeleted) {
+            if (takeTemperatureHandle != NULL && eTaskGetState(takeTemperatureHandle) != eDeleted && eTaskGetState(takeTemperatureHandle) != eReady ) {
                 vTaskDelete(takeTemperatureHandle);
             } else {
                 xTaskCreate(takeTemperature, "Take temperature", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &takeTemperatureHandle);
@@ -180,7 +180,7 @@ void takeTemperature(void *p_param) {
         RGB_setAllColor(8, RGB_BLACK);
         RGB_showLeds(8);
     }
-    vTaskDelete(NULL);
+    vTaskDelete(takeTemperatureHandle);
 }
 
 /** 
