@@ -384,9 +384,7 @@ bool changeLedColor(bool* needNewInput, uint8_t* dataArray) {
  *    bool switchShowAllLog()
  *
  * @Summary
- *   Tarea encargada de mostrar el log de datos.
- * 
- * @Param
+ *    Tarea encargada de mostrar el log de datos.
  *  
  */
 bool displaySavedLog() {
